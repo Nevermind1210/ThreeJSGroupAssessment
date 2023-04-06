@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import {ImprovisedNoise} from 'three/examples/jsm/math/ImprovedNoise'
 import * as dat from 'lil-gui'
 import { Color } from 'three'
 
@@ -8,7 +9,7 @@ import { Color } from 'three'
  */
 // Debug
 const gui = new dat.GUI()
-
+const perlin = new ImprovisedNoise();
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
@@ -69,7 +70,7 @@ const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
-
+//----------------------------------
 window.addEventListener('resize', () =>
 {
     // Update sizes
