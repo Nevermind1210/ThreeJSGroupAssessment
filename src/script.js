@@ -3,6 +3,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
 import { Color } from 'three'
 
+import { Sky } from 'three/examples/jsm/objects/Sky.js';
+
 /**
  * Base
  */
@@ -15,15 +17,14 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
-/**
- * Textures
- */
+// Textures
 const textureLoader = new THREE.TextureLoader()
 const particleTexture = textureLoader.load('/textures/particles/5.png')
 
 /**
  * Particles
  */
+
 // Geometry
 const partclesGeometry = new THREE.BufferGeometry()
 const count = 5000
@@ -39,10 +40,9 @@ for (let i = 0; i < count * 3; i++) // Times by 3 for same reason above
     colors[i] = Math.random() // Random colours weeeee
 }
 
-partclesGeometry.setAttribute('position', new 
-THREE.BufferAttribute(positions, 3)) 
-partclesGeometry.setAttribute('color', new
-THREE.BufferAttribute(colors, 3))
+partclesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+partclesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+
 //Material
 const particleMaterial = new THREE.PointsMaterial({
     size: 0.1,
@@ -126,3 +126,66 @@ const tick = () =>
 }
 
 tick()
+
+// Start Of the Sky code
+let sky, sun;
+
+initSky();
+renderer.render(scene, camera)
+
+function initSky(){
+
+	// Add Sky
+	sky = new Sky();
+	sky.scale.setScalar(450000);
+	scene.add(sky);
+
+	sun = new THREE.Vector3();
+
+	// Sky Variables
+	const effectController = {
+		turbidity: 10,
+		rayleigh: 3,
+		mieCoefficient: 0.005,
+		mieDirectionalG: 0.7,
+		elevation: 2,
+		azimuth: 180,
+		exposure: renderer.toneMappingExposure
+	};
+
+	function ShowSky(){
+
+		const uniforms = sky.material.uniforms;
+		uniforms['turbidity'].value = effectController.turbidity;
+		uniforms['rayleigh'].value = effectController.rayleigh;
+		uniforms['mieCoefficient'].value = effectController.mieCoefficient;
+		uniforms['mieDirectionalG'].value = effectController.mieDirectionalG;
+
+		const polarAngle = THREE.MathUtils.degToRad( 90 - effectController.elevation );
+		const equatorAngle = THREE.MathUtils.degToRad( effectController.azimuth );
+
+		sun.setFromSphericalCoords(1, polarAngle, equatorAngle);
+
+		uniforms['sunPosition'].value.copy(sun);
+
+		renderer.toneMappingExposure = effectController.exposure;
+		renderer.render(scene, camera);
+
+	}
+
+    // Below is the Pop-up Controls on the screen to do with the sky. This can be removed later:
+
+	gui.add(effectController, 'turbidity', 0.0, 20.0, 0.1).onChange(ShowSky);
+	gui.add(effectController, 'rayleigh', 0.0, 4, 0.001).onChange(ShowSky);
+	gui.add(effectController, 'mieCoefficient', 0.0, 0.1, 0.001).onChange(ShowSky);
+	gui.add(effectController, 'mieDirectionalG', 0.0, 1, 0.001).onChange(ShowSky);
+	gui.add(effectController, 'elevation', 0, 90, 0.1).onChange(ShowSky);
+	gui.add(effectController, 'azimuth', - 180, 180, 0.1).onChange(ShowSky);
+	gui.add(effectController, 'exposure', 0, 1, 0.0001).onChange(ShowSky);
+
+    //Above is the Pop-up Controls for the sky
+
+	ShowSky();
+
+}
+// End Of Sky
