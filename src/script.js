@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import {ImprovisedNoise} from 'three/examples/jsm/math/ImprovedNoise'
+// import {ImprovisedNoise} from 'three/examples/jsm/math/ImprovedNoise'
 import * as dat from 'lil-gui'
 import { Color } from 'three'
 
