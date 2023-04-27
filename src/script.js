@@ -11,7 +11,7 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js';
  */
 // Debug
 const gui = new dat.GUI()
-const perlin = new ImprovisedNoise();
+// const perlin = new ImprovisedNoise();
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
