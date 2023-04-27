@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-// import {ImprovisedNoise} from 'three/examples/jsm/math/ImprovedNoise'
+import {ImprovedNoise} from 'three/examples/jsm/math/ImprovedNoise.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import * as dat from 'lil-gui'
 import { Color } from 'three'
 
@@ -10,8 +11,9 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js';
  * Base
  */
 // Debug
-const gui = new dat.GUI()
-// const perlin = new ImprovisedNoise();
+const loader = new GLTFLoader();
+const gui = new dat.GUI();
+const perlin = new ImprovedNoise();
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
@@ -22,6 +24,18 @@ const scene = new THREE.Scene()
 const textureLoader = new THREE.TextureLoader()
 const particleTexture = textureLoader.load('/textures/particles/5.png')
 
+//Models
+
+
+loader.load('/assets/barrel.glb',
+	// called when the resource is loaded
+	function ( gltf ) {
+
+		scene.add( gltf.scene );
+
+		 
+
+	})
 /**
  * Particles
  */
@@ -43,6 +57,8 @@ for (let i = 0; i < count * 3; i++) // Times by 3 for same reason above
 
 partclesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
 partclesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+
+
 
 //Material
 const particleMaterial = new THREE.PointsMaterial({
