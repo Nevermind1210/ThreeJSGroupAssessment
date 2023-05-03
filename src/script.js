@@ -6,7 +6,7 @@ import * as dat from 'lil-gui'
 import { Color } from 'three'
 
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
-import {ImprovedNoise} from "three/examples/jsm/math/ImprovedNoise.js";
+
 
 /**
  * Base
@@ -14,7 +14,7 @@ import {ImprovedNoise} from "three/examples/jsm/math/ImprovedNoise.js";
 // Debug
 const loader = new GLTFLoader();
 const gui = new dat.GUI();
-const perlin = new ImprovedNoise();
+// const perlin = new ImprovedNoise();
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
@@ -28,7 +28,7 @@ const particleTexture = textureLoader.load('/textures/particles/5.png')
 //Models
 
 
-loader.load('/assets/barrel.glb',
+loader.load('/src/buger.glb',
 	// called when the resource is loaded
 	function ( gltf ) {
 
