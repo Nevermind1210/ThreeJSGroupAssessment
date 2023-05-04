@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import {ImprovedNoise} from 'three/examples/jsm/math/ImprovedNoise.js'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { PLYLoader } from 'node_modules/three/examples/jsm/loaders/PLYLoader.js'
 import * as dat from 'lil-gui'
 import { Color } from 'three'
 
@@ -12,7 +12,7 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js';
  * Base
  */
 // Debug
-const loader = new GLTFLoader();
+const loader = new PLYLoader();
 const gui = new dat.GUI();
 // const perlin = new ImprovedNoise();
 // Canvas
@@ -27,12 +27,17 @@ const particleTexture = textureLoader.load('/textures/particles/5.png')
 
 //Models
 
-
-loader.load('/src/buger.glb',
+var mesh = null;
+loader.load('assets/Mesh/Basiccampingtents.ply',
 	// called when the resource is loaded
-	function ( gltf ) {
+	function ( geometry) {
+    var material = new THREE.MeshBasicMaterial();
+    material.color = new THREE.Color(1,1,1);
+    geometry.computeVertextNormals();
+    mesh = new THREE.Mesh(geometry, material);
 
-		scene.add( gltf.scene );
+    // geometry.
+		scene.add(mesh);
 
 		 
 

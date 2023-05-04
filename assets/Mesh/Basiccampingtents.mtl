@@ -1,0 +1,16 @@
+# Blender MTL File: 'Basiccampingtents.blend'
+# Material Count: 1
+
+newmtl blinn1
+Ns 789.099175
+Ka 1.000000 1.000000 1.000000
+Kd 0.500000 0.500000 0.500000
+Ks 0.731818 0.731818 0.731818
+Ke 0.0 0.0 0.0
+Ni 0.000000
+d 1.000000
+illum 2
+map_Kd G:\\Creation\\Projets\\2021_Hiver\\3D assets\\Tente\\Textures\\Doc\\blinn1_Base_Color.png
+map_Ks G:\\Creation\\Projets\\2021_Hiver\\3D assets\\Tente\\Textures\\Doc\\blinn1_Base_Color.png
+map_Ns G:\\Creation\\Projets\\2021_Hiver\\3D assets\\Tente\\Textures\\Doc\\blinn1_Roughness.png
+refl G:\\Creation\\Projets\\2021_Hiver\\3D assets\\Tente\\Textures\\Doc\\blinn1_Metallic.png
