@@ -23,12 +23,15 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
-
+//Fog
+// scene.fog = new THREE.FogExp2(0xcccccc, 2);
 // Textures
 const textureLoader = new THREE.TextureLoader()
 const particleTexture = textureLoader.load('/textures/particles/5.png')
 
 //Models
+
+var bogGeom = new THREE.BoxGeometry()
 //'src/buger.glb'
 
 objloader.setPath('assets/Mesh/');
@@ -155,6 +158,9 @@ const tick = () =>
 }
 
 tick()
+//Mirror Start
+
+//Mirror End
 
 // Start Of the Sky code
 let sky, sun;
@@ -224,7 +230,7 @@ THREE.BufferGeometry.prototype.toQuads = ToQuads;
 
 const perlin = new ImprovedNoise();
 
-let step = 20;
+let step = 10;
 for(let z = -4; z <= 4; z ++){
 	for(let x = -4; x <= 4; x++){
   	let p = createPlane(step, Math.random() * 0x7f7f7f + 0x7f7f7f);
@@ -248,7 +254,7 @@ function setNoise(g, uvShift, multiplier, amplitude){
   let vec2 = new THREE.Vector2();
   for(let i = 0; i < pos.count; i++){
     vec2.fromBufferAttribute(uv, i).add(uvShift).multiplyScalar(multiplier);
-    pos.setZ(i, perlin.noise(vec2.x, vec2.y, 0) * amplitude );
+    pos.setZ(i, perlin.noise(vec2.x , vec2.y*2, 10) * amplitude );
   }
 }
 
