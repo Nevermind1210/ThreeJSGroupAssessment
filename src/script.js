@@ -1,8 +1,8 @@
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { FlyControls} from 'three/examples/jsm/controls/FlyControls.js'
 import {ImprovedNoise} from 'three/examples/jsm/math/ImprovedNoise.js'
-// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import {PLYLoader} from 'three/examples/jsm/loaders/PLYLoader.js'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
+import {MTLLoader} from 'three/examples/jsm/loaders/MTLLoader.js'
 import * as dat from 'lil-gui'
 import { Color } from 'three'
 
@@ -14,7 +14,8 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js';
  */
 // Debug
 //  const loader = new GLTFLoader();
- const loader = new PLYLoader();
+ const loader = new MTLLoader();
+ const objloader = new OBJLoader();
 const gui = new dat.GUI();
 // const perlin = new ImprovedNoise();
 // Canvas
@@ -29,18 +30,22 @@ const particleTexture = textureLoader.load('/textures/particles/5.png')
 
 //Models
 //'src/buger.glb'
+
+objloader.setPath('assets/Mesh/');
+loader.setPath('assets/Mesh/');
 var mesh = null;
-loader.load('assets/Mesh/Basiccampingtents.ply',
+loader.load('Basiccampingtents.mtl',
 	// called when the resource is loaded
-	function ( geometry) {
+  function ( geometry) {
+    geometry.preload();
+    objloader.setMaterials(geometry);    
     
 
-    
-		scene.add(mesh);
-
-		 
-
-	})
+    objloader.load('Basiccampingtents.obj', function(object) {
+      scene.add(object);
+    });
+		
+	});
 /**
  * Particles
  */
@@ -116,8 +121,10 @@ camera.position.z = 3
 scene.add(camera)
 
 // Controls
-const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
+const controls = new FlyControls(camera, canvas)
+controls.movementSpeed = 0.1;
+controls.lookSpeed = 10;
+// controls.autoForward = true;
 
 /**
  * Renderer
@@ -138,7 +145,7 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
 
     // Update controls
-    controls.update()
+    controls.update(0.5);
 
     // Render
     renderer.render(scene, camera)
