@@ -225,7 +225,7 @@ function initSky(){
 }
 // End Of Sky
 
-
+// Start Of Land
 THREE.BufferGeometry.prototype.toQuads = ToQuads;
 
 const perlin = new ImprovedNoise();
@@ -233,7 +233,7 @@ const perlin = new ImprovedNoise();
 let step = 10;
 for(let z = -4; z <= 4; z ++){
 	for(let x = -4; x <= 4; x++){
-  	let p = createPlane(step, Math.random() * 0x7f7f7f + 0x7f7f7f);
+  	let p = createPlane(step, /*Math.random() * 0x7f7f7f + 0x7f7f7f*/new THREE.Color(0,1,0));
     setNoise(p.geometry, new THREE.Vector2(x, z), 2, 3);
     p.geometry.rotateX(Math.PI * 0.5);
     p.position.set(x, 0, z).multiplyScalar(step);
@@ -242,9 +242,9 @@ for(let z = -4; z <= 4; z ++){
 }
 
 function createPlane( step, color){
-  let g = new THREE.PlaneGeometry(step, step, 25, 25).toQuads();
-  let m = new THREE.LineBasicMaterial({color: color});
-  let l = new THREE.LineSegments(g, m);
+  let g = new THREE.PlaneGeometry(step, step, 100, 100).toQuads();
+  let m = new THREE.MeshBasicMaterial({color: color, side: THREE.DoubleSide});
+  let l = new THREE.Mesh(g, m);
   return l;
 }
 
@@ -284,3 +284,5 @@ function ToQuads() {
   g.setIndex(indices);
   return g;
 }
+
+//End Of Land
