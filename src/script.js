@@ -228,20 +228,35 @@ let step = 10;
 //This creates the land by calling the other functions below
 for(let z = -4; z <= 4; z ++){
 	for(let x = -4; x <= 4; x++){
-  	let p = createPlane(step, /*Math.random() * 0x7f7f7f + 0x7f7f7f*/new THREE.Color(0,1,0));
-    setNoise(p.geometry, new THREE.Vector2(x, z), 2, 3);
-    p.geometry.rotateX(Math.PI * 0.5);
-    p.position.set(x, 0, z).multiplyScalar(step);
-    scene.add(p);
+    const red = 50 / 255;
+    const green = 168 / 255;
+    const blue = 82 / 255;
+  	let plane = createPlane(step, new THREE.Color(red, green, blue));
+    // Below makes the plane a random colour. If you are testing this, comment the plane above first.
+    //let plane = createPlane(step, Math.random() * 0x7f7f7f + 0x7f7f7f);
+    setNoise(plane.geometry, new THREE.Vector2(x, z), 2, 3);
+    plane.geometry.rotateX(Math.PI * 0.5);
+    plane.position.set(x, 0, z).multiplyScalar(step);
+    scene.add(plane);
   }
 }
 
 //This function creates the plane that will be the land in the scene
-function createPlane( step, color){ 
-  let g = new THREE.PlaneGeometry(step, step, 100, 100).toQuads();
-  let m = new THREE.MeshBasicMaterial({color: color, side: THREE.DoubleSide});
-  let l = new THREE.Mesh(g, m);
-  return l;
+function createPlane(step, color){ 
+  var geometry = new THREE.PlaneGeometry(step, step, 100, 100)/*.toQuads()*/;
+
+  //This section makes the plane geometry curved
+  var vertices = Math.abs(geometry.attributes.position.array);
+  for (let i = 0; i < vertices.length; i++) {
+    const vertex = vertices[i];
+    const distanceFromCenter = Math.abs(vertex.x);
+    const curveAmount = Math.sin(distanceFromCenter * 0.5) * 0.5;
+    vertex.z = curveAmount;
+  }
+
+  let material = new THREE.MeshBasicMaterial({color: color, side: THREE.DoubleSide});
+  let plane = new THREE.Mesh(geometry, material);
+  return plane;
 }
 
 //This function sets the curve and hills of the land
@@ -255,7 +270,9 @@ function setNoise(g, uvShift, multiplier, amplitude){
   }
 }
 
-//This function connects plane geometry into chunks so that the land can be connected
+//This function makes the plane geometry into a quadrant.
+//If this function is called on though, it makes the plane appear more like triangles.
+//So that is it is not called upon.
 function ToQuads() {
 	let g = this;
   let p = g.parameters;
