@@ -21,14 +21,55 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 //Fog Code
-// scene.fog = new THREE.FogExp2(0xcccccc, 2);
+scene.fog = new THREE.FogExp2(0xDFE9F3, 0.1);
+//fog test
+var treeCount = 100;
+var minHeight = 1;
+var maxHeight = 2.5;
+var minSize = 0.1;
+var maxSize = 1;
+var areaSize = 100;
+var treeArray = [];
+
+var boxMat =  new THREE.MeshBasicMaterial();
+
+boxMat.color = new THREE.Color(0.545, 0.271, 0.075);
+function CreateTrees()
+{
+for (let i = 0; i < treeCount; i++)
+{
+  const height = Math.random() * (maxHeight - minHeight) + minHeight;
+   const width =  Math.random() * (maxSize - minSize) + minSize;
+  var xAxis = (Math.random() - 0.5) * areaSize;
+  var zAxis = (Math.random() - 0.5) * areaSize;
+
+  var boxGeom = new THREE.BoxGeometry(width,height,width);
+  
+  
+  var testBox = new THREE.Mesh(boxGeom,boxMat);
+  testBox.position.y += 1;
+  testBox.position.x = xAxis;
+  testBox.position.z = zAxis;
+
+  treeArray.push(testBox);
+}
+
+for (let i =0; i < treeArray.length; i++)
+{
+  var tree = treeArray[i];
+  scene.add(tree);
+}
+}
+ 
+CreateTrees();
+
 
 //Textures
 const textureLoader = new THREE.TextureLoader()
 const particleTexture = textureLoader.load('/textures/particles/5.png')
 
-//Models
-var bogGeom = new THREE.BoxGeometry()
+
+
 //////////Lighting/////////
 var ambientLight = new THREE.AmbientLight(new THREE.Color(1,1,1),5);
 
@@ -105,6 +146,7 @@ window.addEventListener('resize', () =>
 
     //Update camera
     camera.aspect = sizes.width / sizes.height
+    camera.fov = 1000;
     camera.updateProjectionMatrix()
 
     //Update renderer
@@ -115,12 +157,13 @@ window.addEventListener('resize', () =>
 //Camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
 camera.position.z = 3
+camera.position.y += 5
 scene.add(camera)
 
 //Controls
 const controls = new FlyControls(camera, canvas)
-controls.movementSpeed = 0.1;
-controls.lookSpeed = 10;
+controls.movementSpeed = 0.05;
+controls.lookSpeed = 20;
 //controls.autoForward = true;
 
 //Renderer
@@ -138,7 +181,7 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
 
     //Update controls
-    controls.update(0.5);
+    controls.update(1);
 
     //Render
     renderer.render(scene, camera)
