@@ -32,6 +32,10 @@ const particleTexture = textureLoader.load('/textures/particles/5.png')
 //Models
 
 var bogGeom = new THREE.BoxGeometry()
+//////////Lighting/////////
+var ambientLight = new THREE.AmbientLight(new THREE.Color(1,1,1),5);
+
+scene.add(ambientLight);
 //'src/buger.glb'
 
 objloader.setPath('assets/Mesh/');
@@ -123,11 +127,12 @@ const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 
 camera.position.z = 3
 scene.add(camera)
 
-// Controls
+///////// Controls////////
 const controls = new FlyControls(camera, canvas)
 controls.movementSpeed = 0.1;
 controls.lookSpeed = 10;
-// controls.autoForward = true;
+controls.dragToLook = true;
+controls.autoForward = true;
 
 /**
  * Renderer
@@ -243,7 +248,7 @@ for(let z = -4; z <= 4; z ++){
 
 function createPlane( step, color){
   let g = new THREE.PlaneGeometry(step, step, 100, 100).toQuads();
-  let m = new THREE.MeshBasicMaterial({color: color, side: THREE.DoubleSide});
+  let m = new THREE.MeshLambertMaterial({color: color, side: THREE.DoubleSide});
   let l = new THREE.Mesh(g, m);
   return l;
 }
@@ -254,7 +259,7 @@ function setNoise(g, uvShift, multiplier, amplitude){
   let vec2 = new THREE.Vector2();
   for(let i = 0; i < pos.count; i++){
     vec2.fromBufferAttribute(uv, i).add(uvShift).multiplyScalar(multiplier);
-    pos.setZ(i, perlin.noise(vec2.x , vec2.y*2, 10) * amplitude );
+    pos.setZ(i, perlin.noise(vec2.x , vec2.y*2, 10) * amplitude);
   }
 }
 
