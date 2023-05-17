@@ -225,21 +225,27 @@ const perlin = new ImprovedNoise();
 
 let step = 10;
 
+// const LandGradient = {
+//   step: 10
+// };
+
 //This creates the land by calling the other functions below
-for(let z = -4; z <= 4; z ++){
-	for(let x = -4; x <= 4; x++){
-    const red = 50 / 255;
-    const green = 168 / 255;
-    const blue = 82 / 255;
-  	let plane = createPlane(step, new THREE.Color(red, green, blue));
-    // Below makes the plane a random colour. If you are testing this, comment the plane above first.
-    //let plane = createPlane(step, Math.random() * 0x7f7f7f + 0x7f7f7f);
-    setNoise(plane.geometry, new THREE.Vector2(x, z), 2, 3);
-    plane.geometry.rotateX(Math.PI * 0.5);
-    plane.position.set(x, 0, z).multiplyScalar(step);
-    scene.add(plane);
+//function ShowLand(){ 
+  for(let z = -4; z <= 4; z ++){
+	  for(let x = -4; x <= 4; x++){
+      const red = 50 / 255;
+      const green = 168 / 255;
+      const blue = 82 / 255;
+  	  let plane = createPlane(step, new THREE.Color(red, green, blue));
+      // Below makes the plane a random colour. If you are testing this, comment the plane above first.
+      //let plane = createPlane(step, Math.random() * 0x7f7f7f + 0x7f7f7f);
+      setNoise(plane.geometry, new THREE.Vector2(x, z), 2, 3);
+      plane.geometry.rotateX(Math.PI * 0.5);
+      plane.position.set(x, 0, z).multiplyScalar(step);
+      scene.add(plane);
+    }
   }
-}
+//}
 
 //This function creates the plane that will be the land in the scene
 function createPlane(step, color){ 
@@ -299,5 +305,7 @@ function ToQuads() {
   g.setIndex(indices);
   return g;
 }
+
+//gui.add(LandGradient, 'step', 0, 100, 1).onChange(ShowLand);
 
 /*End Of Land code*/
