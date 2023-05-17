@@ -22,18 +22,13 @@ const scene = new THREE.Scene()
 
 //Fog Code
 scene.fog = new THREE.FogExp2(0xDFE9F3, 0.1);
-//fog test
+//trees creation
 var treeCount = 100;
 var minHeight = 1;
 var maxHeight = 2.5;
 var minSize = 0.1;
 var maxSize = 1;
-var areaSize = 100;
-var treeArray = [];
-
-var boxMat =  new THREE.MeshBasicMaterial();
-
-boxMat.color = new THREE.Color(0.545, 0.271, 0.075);
+var areaSize = 50;
 function CreateTrees()
 {
 for (let i = 0; i < treeCount; i++)
@@ -43,24 +38,32 @@ for (let i = 0; i < treeCount; i++)
   var xAxis = (Math.random() - 0.5) * areaSize;
   var zAxis = (Math.random() - 0.5) * areaSize;
 
-  var boxGeom = new THREE.BoxGeometry(width,height,width);
-  
-  
-  var testBox = new THREE.Mesh(boxGeom,boxMat);
-  testBox.position.y += 1;
-  testBox.position.x = xAxis;
-  testBox.position.z = zAxis;
+  // Create the cone geometry for the leaves
+  var coneGeometry = new THREE.ConeGeometry(width+0.5, height+1, 10);
+  var coneMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  var cone = new THREE.Mesh(coneGeometry, coneMaterial);
 
-  treeArray.push(testBox);
-}
+  // Create the rectangle geometry for the stump
+  var stumpGeometry = new THREE.BoxGeometry(width -1, height, width-1);
+  var stumpMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
+  var stump = new THREE.Mesh(stumpGeometry, stumpMaterial);
 
-for (let i =0; i < treeArray.length; i++)
-{
-  var tree = treeArray[i];
+  // Position the objects
+  cone.position.y = 2; // Place the cone directly on top of the stump
+  stump.position.y = 0.5; // Move the stump to half of its height
+
+  // Create a group to hold both objects
+  var tree = new THREE.Group();
+  tree.add(cone);
+  tree.add(stump);
+  tree.position.x = xAxis;
+  tree.position.z = zAxis;
+  tree.position.y += 1;
+  // Add the tree to the scene
   scene.add(tree);
+
 }
 }
- 
 CreateTrees();
 
 
@@ -94,7 +97,7 @@ loader.load('Basiccampingtents.mtl',
 
 // Particle Geometry
 const partclesGeometry = new THREE.BufferGeometry()
-const count = 5000
+const count = 20000;
 
 const positions = new Float32Array(count * 3) // Times by 3 reason
 // each postion is composed of 3 values (x y z)
@@ -103,7 +106,7 @@ const colors = new Float32Array(count * 3)
 
 for (let i = 0; i < count * 3; i++) // Times by 3 for same reason above
 {
-    positions[i] = (Math.random() - 0.5) * 10 // have a random value between -05 and +0.5
+    positions[i] = (Math.random() - 0.5) * 100 // have a random value between -05 and +0.5
     colors[i] = Math.random() // Random colours weeeee
 }
 
@@ -127,6 +130,7 @@ const particleMaterial = new THREE.PointsMaterial({
 
 //Particle Points
 const particles = new THREE.Points(partclesGeometry, particleMaterial)
+particles.position.y +=3;
 scene.add(particles)
 
 /*End of Particle code*/
