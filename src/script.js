@@ -5,7 +5,7 @@ import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader.js'
 import {MTLLoader} from 'three/examples/jsm/loaders/MTLLoader.js'
 import * as dat from 'lil-gui'
 import {Color} from 'three'
-import {Sky} from 'three/examples/jsm/objects/Sky.js';
+import {Sky} from 'three/examples/jsm/objects/Sky.js'
 
 // Debug
 
@@ -22,7 +22,8 @@ const scene = new THREE.Scene()
 
 //Fog Code
 scene.fog = new THREE.FogExp2(0xDFE9F3, 0.1);
-//trees creation
+
+//Trees creation
 var treeCount = 100;
 var minHeight = 1;
 var maxHeight = 2.5;
@@ -92,7 +93,6 @@ loader.load('Basiccampingtents.mtl',
 		
 	});
 
-
 /* Particle Code starts here*/
 
 // Particle Geometry
@@ -141,7 +141,7 @@ const sizes = {
     height: window.innerHeight
 }
 
-//Resize
+//Resize Function
 window.addEventListener('resize', () =>
 {
     //Update sizes
@@ -357,6 +357,39 @@ function ToQuads() {
   return g;
 }
 
+//To add the step GUI, uncomment the LandGradient and the ShowLand function above
+//However this may mess up with trees and other stuff
 //gui.add(LandGradient, 'step', 0, 100, 1).onChange(ShowLand);
 
 /*End Of Land code*/
+
+/*Start of Cloud code*/
+
+// Create a cloud material
+var cloudTexture = new THREE.TextureLoader().load('cloud1.png');
+var cloudMaterial = new THREE.MeshBasicMaterial({ map: cloudTexture, transparent: true });
+
+// Create multiple cloud meshes and position them randomly in the sky
+var numClouds = 100;
+for (var i = 0; i < numClouds; i++) {
+
+  // Create a cloud geometry with random width and height
+  var randomWidth = Math.random() * 10 + 5; // Random width between 5 and 15
+  var randomHeight = Math.random() * 10 + 5; // Random height between 5 and 15
+  var cloudGeometry = new THREE.PlaneGeometry(randomWidth, randomHeight);
+
+  var cloudMesh = new THREE.Mesh(cloudGeometry, cloudMaterial);
+
+  // Set random positions in the sky
+  cloudMesh.position.x = Math.random() * 300 - 50;
+  cloudMesh.position.y = Math.random() * 0 + 50;
+  cloudMesh.position.z = Math.random() * 300 - 50;
+  cloudMesh.rotation.x = Math.PI / 2;
+
+  var randomScale = Math.random() * 2 + 1; // Randomise the range of scale
+  cloudMesh.scale.set(randomScale, randomScale, randomScale);
+
+  scene.add(cloudMesh);
+}
+
+/*End of Cloud code*/
