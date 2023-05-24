@@ -20,8 +20,9 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
-//Fog Code
-scene.fog = new THREE.FogExp2(0xDFE9F3, 0.1);
+//Fog Code 
+scene.fog = new THREE.FogExp2(0xDFE9F3, 0.1); //White fog
+//scene.fog = new THREE.Fog(0x1B1B1B, 10, 15); //Black fog
 
 //Trees creation
 var treeCount = 100;
@@ -257,7 +258,7 @@ function initSky(){
 	sun = new THREE.Vector3();
 
 	//Sky Variables
-	const effectController = {
+	const SkyController = {
 		turbidity: 10,
 		rayleigh: 3,
 		mieCoefficient: 0.005,
@@ -270,31 +271,33 @@ function initSky(){
 	function ShowSky(){
     //Update the sky variables to the scene
 		const uniforms = sky.material.uniforms;
-		uniforms['turbidity'].value = effectController.turbidity;
-		uniforms['rayleigh'].value = effectController.rayleigh;
-		uniforms['mieCoefficient'].value = effectController.mieCoefficient;
-		uniforms['mieDirectionalG'].value = effectController.mieDirectionalG;
+		uniforms['turbidity'].value = SkyController.turbidity;
+		uniforms['rayleigh'].value = SkyController.rayleigh;
+		uniforms['mieCoefficient'].value = SkyController.mieCoefficient;
+		uniforms['mieDirectionalG'].value = SkyController.mieDirectionalG;
 
-		const polarAngle = THREE.MathUtils.degToRad( 90 - effectController.elevation );
-		const equatorAngle = THREE.MathUtils.degToRad( effectController.azimuth );
+		const polarAngle = THREE.MathUtils.degToRad( 90 - SkyController.elevation );
+		const equatorAngle = THREE.MathUtils.degToRad( SkyController.azimuth );
 
 		sun.setFromSphericalCoords(1, polarAngle, equatorAngle);
 
 		uniforms['sunPosition'].value.copy(sun);
 
-		renderer.toneMappingExposure = effectController.exposure;
+		renderer.toneMappingExposure = SkyController.exposure;
 		renderer.render(scene, camera);
 	}
 
   // Below is the Pop-up Controls on the screen to do with the sky. This can be removed if not wanted:
 
-	gui.add(effectController, 'turbidity', 0.0, 20.0, 0.1).onChange(ShowSky);
-	gui.add(effectController, 'rayleigh', 0.0, 4, 0.001).onChange(ShowSky);
-	gui.add(effectController, 'mieCoefficient', 0.0, 0.1, 0.001).onChange(ShowSky);
-	gui.add(effectController, 'mieDirectionalG', 0.0, 1, 0.001).onChange(ShowSky);
-	gui.add(effectController, 'elevation', 0, 90, 0.1).onChange(ShowSky);
-	gui.add(effectController, 'azimuth', - 180, 180, 0.1).onChange(ShowSky);
-	gui.add(effectController, 'exposure', 0, 1, 0.0001).onChange(ShowSky);
+  const SkyFolder = gui.addFolder('Sky');
+	SkyFolder.add(SkyController, 'turbidity', 0.0, 20.0, 0.1).onChange(ShowSky);
+	SkyFolder.add(SkyController, 'rayleigh', 0.0, 4, 0.001).onChange(ShowSky);
+	SkyFolder.add(SkyController, 'mieCoefficient', 0.0, 0.1, 0.001).onChange(ShowSky);
+	SkyFolder.add(SkyController, 'mieDirectionalG', 0.0, 1, 0.001).onChange(ShowSky);
+	SkyFolder.add(SkyController, 'elevation', 0, 90, 0.1).onChange(ShowSky);
+	SkyFolder.add(SkyController, 'azimuth', - 180, 180, 0.1).onChange(ShowSky);
+	SkyFolder.add(SkyController, 'exposure', 0, 1, 0.0001).onChange(ShowSky);
+  SkyFolder.open();
 
   //Above is the Pop-up Controls for the sky
 
@@ -306,7 +309,7 @@ function initSky(){
 
 /*Land code starts here*/
 
-THREE.BufferGeometry.prototype.toQuads = ToQuads;
+//THREE.BufferGeometry.prototype.toQuads = ToQuads;
 
 const perlin = new ImprovedNoise();
 
@@ -314,36 +317,39 @@ const perlin = new ImprovedNoise();
 //Smaller step gives more mountains
 //Larger step gives more flat land
 
-let step = 10;
+//let step = 10;
+const red = 50 / 255;
+const green = 168 / 255;
+const blue = 82 / 255;
 
-// const LandGradient = {
-//   step: 10
-// };
+let PlaneGeometry, PlaneMaterial, Plane;
+
+const LandController = {
+  step: 10,
+  Colour: 0x32a852
+};
 
 //This creates the land by calling the other functions below
-//function ShowLand(){ 
+function ShowLand(){ 
   for(let z = -4; z <= 4; z ++){
 	  for(let x = -4; x <= 4; x++){
-      const red = 50 / 255;
-      const green = 168 / 255;
-      const blue = 82 / 255;
-  	  let plane = createPlane(step, new THREE.Color(red, green, blue));
+  	  let plane = createPlane(LandController.step, LandController.Colour);
       // Below makes the plane a random colour. If you are testing this, comment the plane above first.
       //let plane = createPlane(step, Math.random() * 0x7f7f7f + 0x7f7f7f);
       setNoise(plane.geometry, new THREE.Vector2(x, z), 2, 3);
       plane.geometry.rotateX(Math.PI * 0.5);
-      plane.position.set(x, 0, z).multiplyScalar(step);
+      plane.position.set(x, 0, z).multiplyScalar(LandController.step);
       scene.add(plane);
     }
   }
-//}
+}
 
 //This function creates the plane that will be the land in the scene
 function createPlane(step, color){ 
-  var geometry = new THREE.PlaneGeometry(step, step, 100, 100)/*.toQuads()*/;
+  PlaneGeometry = new THREE.PlaneGeometry(step, step, 100, 100)/*.toQuads()*/;
 
   //This section makes the plane geometry curved
-  var vertices = Math.abs(geometry.attributes.position.array);
+  var vertices = Math.abs(PlaneGeometry.attributes.position.array);
   for (let i = 0; i < vertices.length; i++) {
     const vertex = vertices[i];
     const distanceFromCenter = Math.abs(vertex.x);
@@ -351,10 +357,24 @@ function createPlane(step, color){
     vertex.z = curveAmount;
   }
 
-  let material = new THREE.MeshBasicMaterial({color: color, side: THREE.DoubleSide});
-  let plane = new THREE.Mesh(geometry, material);
-  return plane;
+  //This creates the plane's material
+  PlaneMaterial = new THREE.MeshBasicMaterial({color: color, side: THREE.DoubleSide});
+  PlaneMaterial.fog = true;
+  PlaneMaterial.transparent = false;
+  Plane = new THREE.Mesh(PlaneGeometry, PlaneMaterial);
+  return Plane;
 }
+
+//This function is supposed to update the land without duplicating it, but its not working though...
+// function UpdateLand(){
+//   scene.remove(Plane);
+//   PlaneGeometry.width = LandController.step;
+//   PlaneGeometry.height = LandController.step;
+//   PlaneMaterial.color = LandController.Colour;
+//   var NewPlane = new THREE.Mesh(PlaneGeometry, PlaneMaterial);
+//   scene.add(NewPlane);
+//   Plane = NewPlane;
+// }
 
 //This function sets the curve and hills of the land
 function setNoise(g, uvShift, multiplier, amplitude){
@@ -370,36 +390,43 @@ function setNoise(g, uvShift, multiplier, amplitude){
 //This function makes the plane geometry into a quadrant.
 //If this function is called on though, it makes the plane appear more like triangles.
 //So that is it is not called upon.
-function ToQuads() {
-	let g = this;
-  let p = g.parameters;
-  let segmentsX = (g.type == "TorusBufferGeometry" ? p.tubularSegments : p.radialSegments) || p.widthSegments || p.thetaSegments || (p.points.length - 1) || 1;
-  let segmentsY = (g.type == "TorusBufferGeometry" ? p.radialSegments : p.tubularSegments) || p.heightSegments || p.phiSegments || p.segments || 1;
-  let indices = [];
-  for (let i = 0; i < segmentsY + 1; i++) {
-    let index11 = 0;
-    let index12 = 0;
-    for (let j = 0; j < segmentsX; j++) {
-      index11 = (segmentsX + 1) * i + j;
-      index12 = index11 + 1;
-      let index21 = index11;
-      let index22 = index11 + (segmentsX + 1);
-      indices.push(index11, index12);
-      if (index22 < ((segmentsX + 1) * (segmentsY + 1) - 1)) {
-        indices.push(index21, index22);
-      }
-    }
-    if ((index12 + segmentsX + 1) <= ((segmentsX + 1) * (segmentsY + 1) - 1)) {
-      indices.push(index12, index12 + segmentsX + 1);
-    }
-  }
-  g.setIndex(indices);
-  return g;
-}
+// function ToQuads() {
+// 	let g = this;
+//   let p = g.parameters;
+//   let segmentsX = (g.type == "TorusBufferGeometry" ? p.tubularSegments : p.radialSegments) || p.widthSegments || p.thetaSegments || (p.points.length - 1) || 1;
+//   let segmentsY = (g.type == "TorusBufferGeometry" ? p.radialSegments : p.tubularSegments) || p.heightSegments || p.phiSegments || p.segments || 1;
+//   let indices = [];
+//   for (let i = 0; i < segmentsY + 1; i++) {
+//     let index11 = 0;
+//     let index12 = 0;
+//     for (let j = 0; j < segmentsX; j++) {
+//       index11 = (segmentsX + 1) * i + j;
+//       index12 = index11 + 1;
+//       let index21 = index11;
+//       let index22 = index11 + (segmentsX + 1);
+//       indices.push(index11, index12);
+//       if (index22 < ((segmentsX + 1) * (segmentsY + 1) - 1)) {
+//         indices.push(index21, index22);
+//       }
+//     }
+//     if ((index12 + segmentsX + 1) <= ((segmentsX + 1) * (segmentsY + 1) - 1)) {
+//       indices.push(index12, index12 + segmentsX + 1);
+//     }
+//   }
+//   g.setIndex(indices);
+//   return g;
+// }
 
-//To add the step GUI, uncomment the LandGradient and the ShowLand function above
+ShowLand();
+
+//To add the GUI for land, uncomment below:
 //However this may mess up with trees and other stuff
-//gui.add(LandGradient, 'step', 0, 100, 1).onChange(ShowLand);
+//Warning: Might lag pretty hard because everytime you change these variables, it creates a new plane instead of updating the original plane.
+
+// const LandFolder = gui.addFolder('Land');
+// LandFolder.add(LandController, 'step', 0, 100, 1).onChange(ShowLand);
+// LandFolder.addColor(LandController, 'Colour').listen().onChange(ShowLand);
+// LandFolder.open();     
 
 /*End Of Land code*/
 
