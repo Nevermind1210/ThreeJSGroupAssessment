@@ -164,23 +164,63 @@ camera.position.z = 3
 camera.position.y += 5
 scene.add(camera)
 
+//Renderer
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas
+})
+renderer.setSize(sizes.width, sizes.height)
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
 //Controls
 const controls = new FlyControls(camera, canvas)
 controls.movementSpeed = 0.05;
 controls.lookSpeed = 20;
 //controls.autoForward = true;
 
-//Renderer
-const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
-})
-renderer.setSize(sizes.width, sizes.height)
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+//Button controls:
+
+// W - Move Forwards
+// S - Move Backwards
+// A - Move Left
+// D - Move Right
+// Q - Rotate Anti-Clockwise
+// E - Rotate Clockwise
+// R - Move Up
+// F - Move Down
+// Z - Reset Camera
+// Space - Lock point of view
+
+//Check if any other buttons are pushed
+window.addEventListener('keydown', onKeyDown);
+window.addEventListener('keyup', onKeyUp);
+
+let spaceKeyPressed = false;
+
+function onKeyDown(event) {
+  console.log(event.code);
+  //Freeze looking moevment
+  if (event.code === 'Space') {
+    spaceKeyPressed = true;
+    controls.rollSpeed = 0;
+  }
+  //Reset camera to look straight
+  if (event.code === 'KeyZ'){
+    camera.lookAt(0,camera.position.y,0);
+  }
+}
+
+function onKeyUp(event) {
+  //Unfreeze looking moevment
+  if (event.code === 'Space') {
+    spaceKeyPressed = false;
+    controls.rollSpeed = 0.005;
+  }
+}
 
 //Animate
 const clock = new THREE.Clock()
 
-const tick = () =>
+const animate = () =>
 {
     const elapsedTime = clock.getElapsedTime()
 
@@ -191,10 +231,10 @@ const tick = () =>
     renderer.render(scene, camera)
 
     //Call tick again on the next frame
-    window.requestAnimationFrame(tick)
+    window.requestAnimationFrame(animate)
 }
 
-tick()
+animate()
 
 //Mirror Start
 
