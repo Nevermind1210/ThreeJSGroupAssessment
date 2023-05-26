@@ -274,7 +274,7 @@ const perlin = new ImprovedNoise();
 //Smaller step gives more mountains
 //Larger step gives more flat land
 
-let step = 10;
+let step = 10; //controls the height of bumps// less = more height, more = less height bumps
 
 // const LandGradient = {
 //   step: 10
@@ -282,15 +282,15 @@ let step = 10;
 
 //This creates the land by calling the other functions below
 //function ShowLand(){ 
-  for(let z = -4; z <= 4; z ++){
-	  for(let x = -4; x <= 4; x++){
+  for(let z = -5; z <= 5; z ++){
+	  for(let x = -5; x <= 5; x++){ // controls the length of the terrain
       const red = 50 / 255;
       const green = 168 / 255;
       const blue = 82 / 255;
   	  let plane = createPlane(step, new THREE.Color(red, green, blue));
       // Below makes the plane a random colour. If you are testing this, comment the plane above first.
       //let plane = createPlane(step, Math.random() * 0x7f7f7f + 0x7f7f7f);
-      setNoise(plane.geometry, new THREE.Vector2(x, z), 2, 3);
+      setNoise(plane.geometry, new THREE.Vector2(x, z), 4, 3); //controls how frequent the bumps are
       plane.geometry.rotateX(Math.PI * 0.5);
       plane.position.set(x, 0, z).multiplyScalar(step);
       scene.add(plane);
