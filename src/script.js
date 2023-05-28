@@ -1,8 +1,7 @@
 import * as THREE from 'three'
 import {FlyControls} from 'three/examples/jsm/controls/FlyControls.js'
 import {ImprovedNoise} from 'three/examples/jsm/math/ImprovedNoise.js'
-import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader.js'
-import {MTLLoader} from 'three/examples/jsm/loaders/MTLLoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import * as dat from 'lil-gui'
 import {Color} from 'three'
 import {Sky} from 'three/examples/jsm/objects/Sky.js'
@@ -10,8 +9,7 @@ import {Sky} from 'three/examples/jsm/objects/Sky.js'
 // Debug
 
 //const loader = new GLTFLoader();
-const loader = new MTLLoader();
-const objloader = new OBJLoader();
+
 const gui = new dat.GUI();
 
 // Canvas
@@ -22,12 +20,20 @@ const scene = new THREE.Scene()
 
 //scene.fog = new THREE.FogExp2(FogController.Colour, FogController.Intensity); //White fog
 //scene.fog = new THREE.Fog(0x1B1B1B, 10, 15); //Black fog
+let gltfLoader = new GLTFLoader().load('src/scene.gltf', (gltfscene) => {
+  scene.add(gltfscene.scene);
+});
 
-//Trees creation
+
+
+///////////////////Start Trees creation///////////////
 var treeCount = 100;
-var minHeight = 1;
-var maxHeight = 2.5;
-var minSize = 0.1;
+var minRadius = 0.2;
+var maxRadius = 0.5;
+
+var minHeight = 1.5;
+var maxHeight = 2;
+var minSize = 0.01;
 var maxSize = 1;
 var areaSize = 50;
 function CreateTrees()
@@ -35,7 +41,9 @@ function CreateTrees()
 for (let i = 0; i < treeCount; i++)
 {
   const height = Math.random() * (maxHeight - minHeight) + minHeight;
-   const width =  Math.random() * (maxSize - minSize) + minSize;
+  const width =  Math.random() * (maxSize - minSize) + minSize;
+  const radius = Math.random() * (maxRadius - minRadius) + minRadius;
+
   var xAxis = (Math.random() - 0.5) * areaSize;
   var zAxis = (Math.random() - 0.5) * areaSize;
 
@@ -45,13 +53,17 @@ for (let i = 0; i < treeCount; i++)
   var cone = new THREE.Mesh(coneGeometry, coneMaterial);
 
   // Create the rectangle geometry for the stump
-  var stumpGeometry = new THREE.BoxGeometry(width -1, height, width-1);
+  var stumpGeometry = new THREE.CylinderGeometry(radius, radius, height);
   var stumpMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
   var stump = new THREE.Mesh(stumpGeometry, stumpMaterial);
 
   // Position the objects
-  cone.position.y = 2; // Place the cone directly on top of the stump
-  stump.position.y = 0.5; // Move the stump to half of its height
+  var stumpHeight = stump.geometry.parameters.height;
+  var leavesHeight = cone.geometry.parameters.height;
+  var topCylinderPos = stump.position.y + stumpHeight/2;
+  cone.position.y = topCylinderPos + leavesHeight /2;
+  stump.position.y = 0;
+  
 
   // Create a group to hold both objects
   var tree = new THREE.Group();
@@ -60,6 +72,7 @@ for (let i = 0; i < treeCount; i++)
   tree.position.x = xAxis;
   tree.position.z = zAxis;
   tree.position.y += 1;
+
   // Add the tree to the scene
   scene.add(tree);
 
@@ -67,6 +80,7 @@ for (let i = 0; i < treeCount; i++)
 }
 CreateTrees();
 
+///////////////End of Tree Creation//////////
 
 //Textures
 const textureLoader = new THREE.TextureLoader()
@@ -75,23 +89,11 @@ const particleTexture = textureLoader.load('/textures/particles/5.png')
 
 
 //////////Lighting/////////
-var ambientLight = new THREE.AmbientLight(new THREE.Color(1,1,1),5);
+var ambientLight = new THREE.AmbientLight(new THREE.Color(1,1,0),1);
 
 scene.add(ambientLight);
-//'src/buger.glb'
-objloader.setPath('assets/Mesh/');
-loader.setPath('assets/Mesh/');
-var mesh = null;
-loader.load('Basiccampingtents.mtl',
-	// called when the resource is loaded
-  function ( geometry) {
-    geometry.preload();
-    objloader.setMaterials(geometry);    
-    objloader.load('Basiccampingtents.obj', function(object) {
-      scene.add(object);
-    });
-		
-	});
+
+
 
 /* Particle Code starts here*/
 
@@ -339,6 +341,8 @@ function initSky(){
 /*Land code starts here*/
 
 let PlaneGeometry, PlaneMaterial, Plane;
+let grassLoader = new THREE.TextureLoader().load('Grass.jpg');
+
 
 initLand();
 renderer.render(scene, camera)
@@ -354,6 +358,7 @@ let step = 10; //controls the height of bumps// less = more height, more = less 
     step: 20,
     Colour: 0x32a852 
   };
+  let grassMat = new THREE.MeshStandardMaterial({map: grassLoader, color: LandController.Colour, side: THREE.DoubleSide} );
 
 //This creates the land by calling the other functions below
 //function ShowLand(){ 
@@ -369,15 +374,25 @@ let step = 10; //controls the height of bumps// less = more height, more = less 
       plane.geometry.rotateX(Math.PI * 0.5);
       plane.position.set(x, 0, z).multiplyScalar(step);
       scene.add(plane);
+    }
+  }
+
+  
+
   function createPlane(){
   // Plane Geometry
   PlaneGeometry = new THREE.PlaneGeometry(LandController.step, LandController.step, 100, 100);
   // Plane Material
+  
   PlaneMaterial = new THREE.MeshBasicMaterial({color: LandController.Colour, side: THREE.DoubleSide});
   // Plane Mesh
-  Plane = new THREE.Mesh(PlaneGeometry, PlaneMaterial);
+  Plane = new THREE.Mesh(PlaneGeometry, grassMat);
   return Plane;
   }
+
+  
+  
+  
 
   //Sets the curves of the land
   function setNoise(geometry, uvShift, multiplier, amplitude){
