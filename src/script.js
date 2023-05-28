@@ -249,15 +249,18 @@ renderer.render(scene, camera)
 
 function initFog(){
 
+  //Fog Variables
   const FogController = {
     Colour: 0xDFE9F3,
     Intensity: 0.1
   };
 
+  //Show the fog on scene
   function ShowFog(){
     scene.fog = new THREE.FogExp2(FogController.Colour, FogController.Intensity); //White fog
   }
 
+  //Below is the GUI Controls for the fog
   const FogFolder = gui.addFolder('Fog');
   FogFolder.addColor(FogController, 'Colour').listen().onChange(ShowFog);
 	FogFolder.add(FogController, 'Intensity', 0.0, 1, 0.001).onChange(ShowFog);
@@ -284,7 +287,6 @@ function initSky(){
 	scene.add(sky);
 
 	sun = new THREE.Vector3();
-  //console.log("Added Sky");
 
 	//Sky Variables
 	const SkyController = {
@@ -298,7 +300,6 @@ function initSky(){
 	};
 
 	function ShowSky(){
-    //console.log("Start ShowSky");
     //Update the sky variables to the scene
 		const uniforms = sky.material.uniforms;
 		uniforms['turbidity'].value = SkyController.turbidity;
@@ -315,7 +316,6 @@ function initSky(){
 
 		renderer.toneMappingExposure = SkyController.exposure;
 		renderer.render(scene, camera);
-    //console.log("Render Sky");
 	}
 
   // Below is the Pop-up Controls on the screen to do with the sky. This can be removed if not wanted:
@@ -330,8 +330,6 @@ function initSky(){
 	SkyFolder.add(SkyController, 'exposure', 0, 1, 0.0001).onChange(ShowSky);
   SkyFolder.open();
 
-  //Above is the Pop-up Controls for the sky
-
 	ShowSky();
 
 }
@@ -340,7 +338,6 @@ function initSky(){
 
 /*Land code starts here*/
 
-let Plane;
 let grassLoader = new THREE.TextureLoader().load('Grass.jpg');
 
 initLand();
@@ -350,6 +347,9 @@ function initLand(){
 
   //Add Noise
   const perlin = new ImprovedNoise();
+
+  //This List keeps track of the planes that make up the land
+  var landlist = [];
 
   //Land Variables
   const LandController = {
@@ -383,35 +383,44 @@ function initLand(){
     }
   }
 
-  //Shows the land on scene
-  function ShowLand(){ 
+  //Removes the old plane
+  function RemoveLand(){
+    for (var i = 0; i < landlist.length; i++){
+      scene.remove(landlist[i]);
+    }
+    landlist = [];
+  }
+
+  //Adds the land on scene
+  function AddLand(){ 
     for(let z = -5; z <= 5; z ++){
       for(let x = -5; x <= 5; x++){
-
-        Plane = createPlane();
-  
+        var Plane = createPlane();
         setNoise(Plane.geometry, new THREE.Vector2(x, z), 4, 3);
         Plane.geometry.rotateX(Math.PI * 0.5);
         Plane.position.set(x, 0, z).multiplyScalar(LandController.step);
-
-        //This line adds a new plane instead of changing the original plane, but without it, you can't see any changes...
         scene.add(Plane)
-        //console.log("Added");
+        landlist.push(Plane)
       }
     }
     renderer.render(scene, camera);
-    //console.log("Rendered")
   }
 
   // Below is the Pop-up Controls on the screen to do with the land. This can be removed if not wanted:
-  //Warning: this adds new planes instead of changing the original plane, It may start to lag over time.
+  //The RemoveLand and AddLand functions prevent the scene from duplicating and keeping old planes
 
   const LandFolder = gui.addFolder('Land');
-  LandFolder.add(LandController, 'step', 0, 50, 1).onChange(ShowLand);
-  LandFolder.addColor(LandController, 'Colour').listen().onChange(ShowLand);
+  LandFolder.add(LandController, 'step', 0, 50, 1).onChange(function(){
+    RemoveLand(); //First Remove the old land
+    AddLand();  //Then add the new land based
+  });
+  LandFolder.addColor(LandController, 'Colour').listen().onChange(function(){
+    RemoveLand(); //First Remove the old land
+    AddLand();  //Then add the new land based
+  });
   LandFolder.open(); 
 
-  ShowLand();
+  AddLand();
 
 }
    
@@ -419,81 +428,74 @@ function initLand(){
 
 /*Start of Cloud code*/
 
-// initCloud();
-// renderer.render(scene, camera);
+initCloud();
+renderer.render(scene, camera);
 
-// var cloudTexture = new THREE.TextureLoader().load('cloud1.png');
+function initCloud(){
 
-// function initCloud(){
+  //This List keeps track of the amount of clouds
+  var cloudlist = [];
 
-//   const CloudController = {
-//     Amount: 100
-//   }
+  //Cloud Texture
+  var cloudTexture = new THREE.TextureLoader().load('cloud1.png');
 
-//   function ShowCloud(){
-//     var cloudMaterial = new THREE.MeshBasicMaterial({map: cloudTexture, transparent: true });
-//     cloudMaterial.fog = false;
-//     cloudMaterial.opacity = 0.5;
+  //Cloud Variables
+  const CloudController = {
+    Amount: 100
+  }
 
-//     // Create multiple cloud meshes and position them randomly in the sky
-//     //var numClouds = 100;
-//     for (var i = 0; i < CloudController.Amount; i++) {
+  //Removes old clouds
+  function RemoveCloud(){
+    for (var i = 0; i < cloudlist.length; i++){
+      scene.remove(cloudlist[i]);
+    }
+    cloudlist = [];
+  }
 
-//     // Create a cloud geometry with random width and height
-//     var randomWidth = Math.random() * 10 + 5; // Random width between 5 and 15
-//     var randomHeight = Math.random() * 10 + 5; // Random height between 5 and 15
-//     var cloudGeometry = new THREE.PlaneGeometry(randomWidth, randomHeight);
+  //Adds new clouds
+  function AddCloud(){
 
-//     var cloudMesh = new THREE.Mesh(cloudGeometry, cloudMaterial);
+    // Cloud Material
+    var cloudMaterial = new THREE.MeshBasicMaterial({map: cloudTexture, transparent: true });
+    cloudMaterial.fog = false;
+    cloudMaterial.opacity = 0.5;
 
-//     // Set random positions in the sky
-//     cloudMesh.position.x = Math.random() * 300 - 50;
-//     cloudMesh.position.y = Math.random() * 0 + 50;
-//     cloudMesh.position.z = Math.random() * 300 - 50;
-//     cloudMesh.rotation.x = Math.PI / 2;
+    // Create the needed amount of clouds
+    for (var i = 0; i < CloudController.Amount; i++) {
 
-//     var randomScale = Math.random() * 2 + 1; // Randomise the range of scale
-//     cloudMesh.scale.set(randomScale, randomScale, randomScale);
+    // Cloud geometry with random width and height
+    var randomWidth = Math.random() * 10 + 5; // Random width between 5 and 15
+    var randomHeight = Math.random() * 10 + 5; // Random height between 5 and 15
+    var cloudGeometry = new THREE.PlaneGeometry(randomWidth, randomHeight);
 
-//     scene.add(cloudMesh);
-//     }
-//     renderer.render(scene, camera);
-//   }
+    var cloudMesh = new THREE.Mesh(cloudGeometry, cloudMaterial);
 
-//   const CloudFolder = gui.addFolder('Cloud');
-//   CloudFolder.add(CloudController, 'Amount', 0, 1000, 1).onChange(ShowCloud);
-//   CloudFolder.open(); 
+    // Set random positions in the sky
+    cloudMesh.position.x = THREE.MathUtils.randFloat(-300, 300) - 50;
+    cloudMesh.position.y = Math.random() * 0 + 50;
+    cloudMesh.position.z = THREE.MathUtils.randFloat(-300, 300) - 50;
+    cloudMesh.rotation.x = Math.PI / 2;
 
-//   ShowCloud();
-// }
+    var randomScale = Math.random() * 2 + 1; // Randomise the range of scale
+    cloudMesh.scale.set(randomScale, randomScale, randomScale);
 
-// Create a cloud material
-var cloudTexture = new THREE.TextureLoader().load('cloud1.png');
-var cloudMaterial = new THREE.MeshBasicMaterial({ map: cloudTexture, transparent: true });
-cloudMaterial.fog = false;
-cloudMaterial.opacity = 0.5;
+    scene.add(cloudMesh);
+    cloudlist.push(cloudMesh);
+    }
+    renderer.render(scene, camera);
+  }
 
-// Create multiple cloud meshes and position them randomly in the sky
-var numClouds = 100;
-for (var i = 0; i < numClouds; i++) {
+  //Below is the GUI Controls for the clouds
+  //The RemoveCloud and AddCloud functions prevent the scene from duplicating and keeping old clouds
 
-  // Create a cloud geometry with random width and height
-  var randomWidth = Math.random() * 10 + 5; // Random width between 5 and 15
-  var randomHeight = Math.random() * 10 + 5; // Random height between 5 and 15
-  var cloudGeometry = new THREE.PlaneGeometry(randomWidth, randomHeight);
+  const CloudFolder = gui.addFolder('Cloud');
+  CloudFolder.add(CloudController, 'Amount', 0, 1000, 1).onChange(function(){
+    RemoveCloud(); //Remove old clouds first
+    AddCloud(); //Then add new cloulds on the amount
+  });
+  CloudFolder.open(); 
 
-  var cloudMesh = new THREE.Mesh(cloudGeometry, cloudMaterial);
-
-  // Set random positions in the sky
-  cloudMesh.position.x = Math.random() * 300 - 50;
-  cloudMesh.position.y = Math.random() * 0 + 50;
-  cloudMesh.position.z = Math.random() * 300 - 50;
-  cloudMesh.rotation.x = Math.PI / 2;
-
-  var randomScale = Math.random() * 2 + 1; // Randomise the range of scale
-  cloudMesh.scale.set(randomScale, randomScale, randomScale);
-
-  scene.add(cloudMesh);
+  AddCloud(CloudController.Amount);
 }
 
 /*End of Cloud code*/
