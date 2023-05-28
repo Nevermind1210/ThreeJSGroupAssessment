@@ -340,16 +340,14 @@ function initSky(){
 
 /*Land code starts here*/
 
-let PlaneGeometry, PlaneMaterial, Plane;
+let Plane;
 let grassLoader = new THREE.TextureLoader().load('Grass.jpg');
-
 
 initLand();
 renderer.render(scene, camera)
 
 function initLand(){
 
-let step = 10; //controls the height of bumps// less = more height, more = less height bumps
   //Add Noise
   const perlin = new ImprovedNoise();
 
@@ -358,41 +356,21 @@ let step = 10; //controls the height of bumps// less = more height, more = less 
     step: 20,
     Colour: 0x32a852 
   };
-  let grassMat = new THREE.MeshStandardMaterial({map: grassLoader, color: LandController.Colour, side: THREE.DoubleSide} );
 
-//This creates the land by calling the other functions below
-//function ShowLand(){ 
-  for(let z = -5; z <= 5; z ++){
-	  for(let x = -5; x <= 5; x++){ // controls the length of the terrain
-      const red = 50 / 255;
-      const green = 168 / 255;
-      const blue = 82 / 255;
-  	  let plane = createPlane(step, new THREE.Color(red, green, blue));
-      // Below makes the plane a random colour. If you are testing this, comment the plane above first.
-      //let plane = createPlane(step, Math.random() * 0x7f7f7f + 0x7f7f7f);
-      setNoise(plane.geometry, new THREE.Vector2(x, z), 4, 3); //controls how frequent the bumps are
-      plane.geometry.rotateX(Math.PI * 0.5);
-      plane.position.set(x, 0, z).multiplyScalar(step);
-      scene.add(plane);
-    }
-  }
+  //The "Step" controls the height of bumps but it also changes the width of the plane
+  //Less Step = More height and less width
+  //More Step = Less height and more width
+  //Something like this:
+  //E.G: If step = 1, Then height = 9 and width = 1;
+  //E.G: If step = 9, Then height = 1 and width = 9;
 
-  
-
+  //This creates the plane
   function createPlane(){
-  // Plane Geometry
-  PlaneGeometry = new THREE.PlaneGeometry(LandController.step, LandController.step, 100, 100);
-  // Plane Material
-  
-  PlaneMaterial = new THREE.MeshBasicMaterial({color: LandController.Colour, side: THREE.DoubleSide});
-  // Plane Mesh
-  Plane = new THREE.Mesh(PlaneGeometry, grassMat);
-  return Plane;
+  let PlaneGeometry = new THREE.PlaneGeometry(LandController.step, LandController.step, 100, 100);
+  let GrassMaterial = new THREE.MeshBasicMaterial({map: grassLoader, color: LandController.Colour, side: THREE.DoubleSide});
+  let plane = new THREE.Mesh(PlaneGeometry, GrassMaterial);
+  return plane;
   }
-
-  
-  
-  
 
   //Sets the curves of the land
   function setNoise(geometry, uvShift, multiplier, amplitude){
@@ -407,19 +385,16 @@ let step = 10; //controls the height of bumps// less = more height, more = less 
 
   //Shows the land on scene
   function ShowLand(){ 
-    for(let z = -4; z <= 4; z ++){
-      for(let x = -4; x <= 4; x++){
-        let Plane = createPlane();
+    for(let z = -5; z <= 5; z ++){
+      for(let x = -5; x <= 5; x++){
+
+        Plane = createPlane();
   
-        // Below makes the plane a random colour. If you are testing this, comment the plane above first.
-        //let plane = createPlane(LandController.step, Math.random() * 0x7f7f7f + 0x7f7f7f);
-        
-        //Plane.geometry = new THREE.PlaneGeometry(LandController.step, LandController.step, 100, 100);
-        //Plane.material = new THREE.MeshBasicMaterial({color: LandController.Colour, side: THREE.DoubleSide});
-  
-        setNoise(Plane.geometry, new THREE.Vector2(x, z), 2, 3);
+        setNoise(Plane.geometry, new THREE.Vector2(x, z), 4, 3);
         Plane.geometry.rotateX(Math.PI * 0.5);
         Plane.position.set(x, 0, z).multiplyScalar(LandController.step);
+
+        //This line adds a new plane instead of changing the original plane, but without it, you can't see any changes...
         scene.add(Plane)
         //console.log("Added");
       }
@@ -443,6 +418,54 @@ let step = 10; //controls the height of bumps// less = more height, more = less 
 /*End Of Land code*/
 
 /*Start of Cloud code*/
+
+// initCloud();
+// renderer.render(scene, camera);
+
+// var cloudTexture = new THREE.TextureLoader().load('cloud1.png');
+
+// function initCloud(){
+
+//   const CloudController = {
+//     Amount: 100
+//   }
+
+//   function ShowCloud(){
+//     var cloudMaterial = new THREE.MeshBasicMaterial({map: cloudTexture, transparent: true });
+//     cloudMaterial.fog = false;
+//     cloudMaterial.opacity = 0.5;
+
+//     // Create multiple cloud meshes and position them randomly in the sky
+//     //var numClouds = 100;
+//     for (var i = 0; i < CloudController.Amount; i++) {
+
+//     // Create a cloud geometry with random width and height
+//     var randomWidth = Math.random() * 10 + 5; // Random width between 5 and 15
+//     var randomHeight = Math.random() * 10 + 5; // Random height between 5 and 15
+//     var cloudGeometry = new THREE.PlaneGeometry(randomWidth, randomHeight);
+
+//     var cloudMesh = new THREE.Mesh(cloudGeometry, cloudMaterial);
+
+//     // Set random positions in the sky
+//     cloudMesh.position.x = Math.random() * 300 - 50;
+//     cloudMesh.position.y = Math.random() * 0 + 50;
+//     cloudMesh.position.z = Math.random() * 300 - 50;
+//     cloudMesh.rotation.x = Math.PI / 2;
+
+//     var randomScale = Math.random() * 2 + 1; // Randomise the range of scale
+//     cloudMesh.scale.set(randomScale, randomScale, randomScale);
+
+//     scene.add(cloudMesh);
+//     }
+//     renderer.render(scene, camera);
+//   }
+
+//   const CloudFolder = gui.addFolder('Cloud');
+//   CloudFolder.add(CloudController, 'Amount', 0, 1000, 1).onChange(ShowCloud);
+//   CloudFolder.open(); 
+
+//   ShowCloud();
+// }
 
 // Create a cloud material
 var cloudTexture = new THREE.TextureLoader().load('cloud1.png');
