@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import {FlyControls} from 'three/examples/jsm/controls/FlyControls.js'
 import {ImprovedNoise} from 'three/examples/jsm/math/ImprovedNoise.js'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import * as dat from 'lil-gui'
 import {Color} from 'three'
 import {Sky} from 'three/examples/jsm/objects/Sky.js'
@@ -20,22 +19,61 @@ const scene = new THREE.Scene()
 
 //scene.fog = new THREE.FogExp2(FogController.Colour, FogController.Intensity); //White fog
 //scene.fog = new THREE.Fog(0x1B1B1B, 10, 15); //Black fog
-let gltfLoader = new GLTFLoader().load('src/scene.gltf', (gltfscene) => {
-  scene.add(gltfscene.scene);
-});
+
 
 
 
 ///////////////////Start Trees creation///////////////
-var treeCount = 100;
-var minRadius = 0.2;
-var maxRadius = 0.5;
-
+var treeCount = 500;
+var minRadius = 0.1;
+var maxRadius = 0.4;
 var minHeight = 1.5;
 var maxHeight = 2;
 var minSize = 0.01;
 var maxSize = 1;
-var areaSize = 50;
+var areaSize = 160;
+
+/////////Tree Textures////////
+var stumpTxtLoader = new THREE.TextureLoader();
+var colorMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_basecolor.jpg');
+var NormalMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_normal.jpg');
+var RoughnessMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_roughness.jpg');
+var AOMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_ambientOcclusion.jpg');
+var HeightMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_height.png');
+var Dmap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_Displacement.jpg');
+
+
+var woodMat = new THREE.MeshStandardMaterial({
+  map : colorMap,
+  normalMap : NormalMap,
+  roughnessMap: RoughnessMap,
+  aoMap: AOMap,
+  displacementMap : Dmap,
+  displacementScale : 0.5,
+  bumpMap : HeightMap,
+  bumpScale : 2
+});
+
+///////////Leaves Textures////////
+var leavesTxtLoader = new THREE.TextureLoader();
+var LcolorMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_basecolor.jpg');
+var LNormalMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_normal.jpg');
+var LRoughnessMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_roughness.jpg');
+var LAOMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_ambientOcclusion.jpg');
+var LHeightMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_height.png');
+var LDMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_Displacement.jpg');
+
+var leavesMat = new THREE.MeshStandardMaterial({
+  map : LcolorMap,
+  normalMap : LNormalMap,
+  roughnessMap : LRoughnessMap,
+  aoMap : LAOMap,
+  bumpMap : LHeightMap,
+  bumpScale : 1.3
+});
+//  var coneMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+// var stumpMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
+
 function CreateTrees()
 {
 for (let i = 0; i < treeCount; i++)
@@ -48,14 +86,13 @@ for (let i = 0; i < treeCount; i++)
   var zAxis = (Math.random() - 0.5) * areaSize;
 
   // Create the cone geometry for the leaves
-  var coneGeometry = new THREE.ConeGeometry(width+0.5, height+1, 10);
-  var coneMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  var cone = new THREE.Mesh(coneGeometry, coneMaterial);
+  var coneGeometry = new THREE.ConeGeometry(width+0.5, height+1, 170);
+  var cone = new THREE.Mesh(coneGeometry, leavesMat);
 
   // Create the rectangle geometry for the stump
   var stumpGeometry = new THREE.CylinderGeometry(radius, radius, height);
-  var stumpMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
-  var stump = new THREE.Mesh(stumpGeometry, stumpMaterial);
+  
+  var stump = new THREE.Mesh(stumpGeometry, woodMat);
 
   // Position the objects
   var stumpHeight = stump.geometry.parameters.height;
@@ -99,7 +136,7 @@ scene.add(ambientLight);
 
 // Particle Geometry
 const partclesGeometry = new THREE.BufferGeometry()
-const count = 20000;
+const count = 10000;
 
 const positions = new Float32Array(count * 3) // Times by 3 reason
 // each postion is composed of 3 values (x y z)
@@ -132,7 +169,9 @@ const particleMaterial = new THREE.PointsMaterial({
 
 //Particle Points
 const particles = new THREE.Points(partclesGeometry, particleMaterial)
-particles.position.y +=3;
+particles.position.y = 80;
+particles.position.x += 50;
+particles.position.z += 30;
 scene.add(particles)
 
 /*End of Particle code*/
@@ -227,7 +266,7 @@ const animate = () =>
     const elapsedTime = clock.getElapsedTime()
 
     //Update controls
-    controls.update(1);
+    controls.update(1.5); //can also control the speed
 
     //Render
     renderer.render(scene, camera)
@@ -341,7 +380,10 @@ function initSky(){
 /*Land code starts here*/
 
 let PlaneGeometry, PlaneMaterial, Plane;
-let grassLoader = new THREE.TextureLoader().load('Grass.jpg');
+let grassTxtLoader = new THREE.TextureLoader()
+let GColorMap = grassTxtLoader.load('grassTexture/Grass.jpg');
+let GHeightMap  = grassTxtLoader.load('grassTexture/BumpGrass.jpg');
+let GDMap = grassTxtLoader.load('grassTexture/GrassDis.jpg');
 
 
 initLand();
@@ -358,7 +400,15 @@ let step = 10; //controls the height of bumps// less = more height, more = less 
     step: 20,
     Colour: 0x32a852 
   };
-  let grassMat = new THREE.MeshStandardMaterial({map: grassLoader, color: LandController.Colour, side: THREE.DoubleSide} );
+  let grassMat = new THREE.MeshStandardMaterial({
+    map: GColorMap,
+    bumpMap : GHeightMap,
+    bumpScale : 2, 
+    displacementMap : GDMap,
+    displacementScale : 0.3,
+    color: LandController.Colour, 
+    side: THREE.DoubleSide 
+  });
 
 //This creates the land by calling the other functions below
 //function ShowLand(){ 
