@@ -17,122 +17,10 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
-//scene.fog = new THREE.FogExp2(FogController.Colour, FogController.Intensity); //White fog
-//scene.fog = new THREE.Fog(0x1B1B1B, 10, 15); //Black fog
-
-
-
-
-///////////////////Start Trees creation///////////////
-var treeCount = 500;
-var minRadius = 0.1;
-var maxRadius = 0.4;
-var minHeight = 1.5;
-var maxHeight = 2;
-var minSize = 0.01;
-var maxSize = 1;
-var areaSize = 160;
-
-/////////Tree Textures////////
-var stumpTxtLoader = new THREE.TextureLoader();
-var colorMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_basecolor.jpg');
-var NormalMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_normal.jpg');
-var RoughnessMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_roughness.jpg');
-var AOMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_ambientOcclusion.jpg');
-var HeightMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_height.png');
-var Dmap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_Displacement.jpg');
-
-
-var woodMat = new THREE.MeshStandardMaterial({
-  map : colorMap,
-  normalMap : NormalMap,
-  roughnessMap: RoughnessMap,
-  aoMap: AOMap,
-  displacementMap : Dmap,
-  displacementScale : 0.5,
-  bumpMap : HeightMap,
-  bumpScale : 2
-});
-
-///////////Leaves Textures////////
-var leavesTxtLoader = new THREE.TextureLoader();
-var LcolorMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_basecolor.jpg');
-var LNormalMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_normal.jpg');
-var LRoughnessMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_roughness.jpg');
-var LAOMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_ambientOcclusion.jpg');
-var LHeightMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_height.png');
-var LDMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_Displacement.jpg');
-
-var leavesMat = new THREE.MeshStandardMaterial({
-  map : LcolorMap,
-  normalMap : LNormalMap,
-  roughnessMap : LRoughnessMap,
-  aoMap : LAOMap,
-  bumpMap : LHeightMap,
-  bumpScale : 1.3
-});
-//  var coneMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-// var stumpMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
-
-function CreateTrees()
-{
-for (let i = 0; i < treeCount; i++)
-{
-  const height = Math.random() * (maxHeight - minHeight) + minHeight;
-  const width =  Math.random() * (maxSize - minSize) + minSize;
-  const radius = Math.random() * (maxRadius - minRadius) + minRadius;
-
-  var xAxis = (Math.random() - 0.5) * areaSize;
-  var zAxis = (Math.random() - 0.5) * areaSize;
-
-  // Create the cone geometry for the leaves
-  var coneGeometry = new THREE.ConeGeometry(width+0.5, height+1, 170);
-  var cone = new THREE.Mesh(coneGeometry, leavesMat);
-
-  // Create the rectangle geometry for the stump
-  var stumpGeometry = new THREE.CylinderGeometry(radius, radius, height);
-  
-  var stump = new THREE.Mesh(stumpGeometry, woodMat);
-
-  // Position the objects
-  var stumpHeight = stump.geometry.parameters.height;
-  var leavesHeight = cone.geometry.parameters.height;
-  var topCylinderPos = stump.position.y + stumpHeight/2;
-  cone.position.y = topCylinderPos + leavesHeight /2;
-  stump.position.y = 0;
-  
-
-  // Create a group to hold both objects
-  var tree = new THREE.Group();
-  tree.add(cone);
-  tree.add(stump);
-  tree.position.x = xAxis;
-  tree.position.z = zAxis;
-  tree.position.y += 1;
-
-  // Add the tree to the scene
-  scene.add(tree);
-
-}
-}
-CreateTrees();
-
-///////////////End of Tree Creation//////////
-
-//Textures
-const textureLoader = new THREE.TextureLoader()
-const particleTexture = textureLoader.load('/textures/particles/5.png')
-
-
-
 //////////Lighting/////////
 var ambientLight = new THREE.AmbientLight(new THREE.Color(1,1,0),1);
 
 scene.add(ambientLight);
-
-
-
-
 
 //Sizes
 const sizes = {
@@ -411,12 +299,10 @@ function initSky(){
 
 /*Land code starts here*/
 
-let PlaneGeometry, PlaneMaterial, Plane;
 let grassTxtLoader = new THREE.TextureLoader()
 let GColorMap = grassTxtLoader.load('grassTexture/Grass.jpg');
 let GHeightMap  = grassTxtLoader.load('grassTexture/BumpGrass.jpg');
 let GDMap = grassTxtLoader.load('grassTexture/GrassDis.jpg');
-let grassLoader = new THREE.TextureLoader().load('Grass.jpg');
 
 initLand();
 renderer.render(scene, camera)
@@ -450,7 +336,7 @@ function initLand(){
     bumpMap : GHeightMap,
     bumpScale : 2, 
     displacementMap : GDMap,
-    displacementScale : 0.3, //This scale may reveal holes in the ground
+    displacementScale : 0.01, //This scale may reveal holes in the ground
     color: LandController.Colour, 
     side: THREE.DoubleSide 
   });
@@ -587,3 +473,151 @@ function initCloud(){
 }
 
 /*End of Cloud Code*/
+
+/*Start of Tree Code*/
+
+initTree();
+renderer.render(scene, camera);
+
+function initTree(){
+
+  const TreeController = {
+    treeCount: 500,
+    minRadius: 0.1,
+    maxRadius: 0.4,
+    minHeight: 1.5,
+    maxHeight: 2,
+    minSize: 0.01,
+    maxSize: 1,
+    areaSize: 150
+  }
+
+  var treelist = [];
+
+  /////////Tree Textures////////
+  var stumpTxtLoader = new THREE.TextureLoader();
+  var colorMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_basecolor.jpg');
+  var NormalMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_normal.jpg');
+  var RoughnessMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_roughness.jpg');
+  var AOMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_ambientOcclusion.jpg');
+  var HeightMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_height.png');
+  var Dmap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_Displacement.jpg');
+
+
+  var woodMat = new THREE.MeshStandardMaterial({
+    map : colorMap,
+    normalMap : NormalMap,
+    roughnessMap: RoughnessMap,
+    aoMap: AOMap,
+    displacementMap : Dmap,
+    displacementScale : 0.5,
+    bumpMap : HeightMap,
+    bumpScale : 2
+  });
+
+  ///////////Leaves Textures////////
+  var leavesTxtLoader = new THREE.TextureLoader();
+  var LcolorMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_basecolor.jpg');
+  var LNormalMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_normal.jpg');
+  var LRoughnessMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_roughness.jpg');
+  var LAOMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_ambientOcclusion.jpg');
+  var LHeightMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_height.png');
+  var LDMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_Displacement.jpg');
+
+  var leavesMat = new THREE.MeshStandardMaterial({
+    map : LcolorMap,
+    normalMap : LNormalMap,
+    roughnessMap : LRoughnessMap,
+    aoMap : LAOMap,
+    bumpMap : LHeightMap,
+    bumpScale : 1.3
+  });
+  //  var coneMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  // var stumpMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
+
+  function RemoveTrees(){
+    for (var i = 0; i < treelist.length; i++){
+      scene.remove(treelist[i]);
+    }
+    treelist = [];
+  }
+
+  function CreateTrees(){
+    for (let i = 0; i < TreeController.treeCount; i++){
+      const height = Math.random() * (TreeController.maxHeight - TreeController.minHeight) + TreeController.minHeight;
+      const width =  Math.random() * (TreeController.maxSize - TreeController.minSize) + TreeController.minSize;
+      const radius = Math.random() * (TreeController.maxRadius - TreeController.minRadius) + TreeController.minRadius;
+
+      var xAxis = (Math.random() - 0.5) * TreeController.areaSize;
+      var zAxis = (Math.random() - 0.5) * TreeController.areaSize;
+
+      // Create the cone geometry for the leaves
+      var coneGeometry = new THREE.ConeGeometry(width+0.5, height+1, 170);
+      var cone = new THREE.Mesh(coneGeometry, leavesMat);
+
+      // Create the rectangle geometry for the stump
+      var stumpGeometry = new THREE.CylinderGeometry(radius, radius, height);
+  
+      var stump = new THREE.Mesh(stumpGeometry, woodMat);
+
+      // Position the objects
+      var stumpHeight = stump.geometry.parameters.height;
+      var leavesHeight = cone.geometry.parameters.height;
+      var topCylinderPos = stump.position.y + stumpHeight/2;
+      cone.position.y = topCylinderPos + leavesHeight /2;
+      stump.position.y = 0;
+  
+
+      // Create a group to hold both objects
+      var tree = new THREE.Group();
+      tree.add(cone);
+      tree.add(stump);
+      tree.position.x = xAxis;
+      tree.position.z = zAxis;
+      tree.position.y += 1;
+
+      // Add the tree to the scene
+      scene.add(tree);
+      treelist.push(tree);
+    }
+  }
+
+  const TreeFolder = gui.addFolder('Trees');
+  TreeFolder.add(TreeController, 'treeCount', 0, 1000, 1).onChange(function(){
+    RemoveTrees();
+    CreateTrees();
+  })
+  TreeFolder.add(TreeController, 'minRadius', 0.05, 0.15, 0.001).onChange(function(){
+    RemoveTrees();
+    CreateTrees();
+  })
+  TreeFolder.add(TreeController, 'maxRadius', 0.35, 0.45, 0.001).onChange(function(){
+    RemoveTrees();
+    CreateTrees();
+  })
+  TreeFolder.add(TreeController, 'minHeight', 1.25, 1.75, 0.01).onChange(function(){
+    RemoveTrees();
+    CreateTrees();
+  })
+  TreeFolder.add(TreeController, 'maxHeight', 1.75, 2.25, 0.01).onChange(function(){
+    RemoveTrees();
+    CreateTrees();
+  })
+  TreeFolder.add(TreeController, 'minSize', 0.0075, 0.0125, 0.001).onChange(function(){
+    RemoveTrees();
+    CreateTrees();
+  })
+  TreeFolder.add(TreeController, 'maxSize', 0.75, 1.25, 0.001).onChange(function(){
+    RemoveTrees();
+    CreateTrees();
+  })
+  TreeFolder.add(TreeController, 'areaSize', 0, 300, 1).onChange(function(){
+    RemoveTrees();
+    CreateTrees();
+  })
+
+  CreateTrees();
+
+}
+
+/*End Of Tree Code*/
