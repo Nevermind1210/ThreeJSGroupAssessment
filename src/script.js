@@ -29,7 +29,7 @@ var minRadius = 0.1;
 var maxRadius = 0.4;
 var minHeight = 1.5;
 var maxHeight = 2;
-var minSize = 0.01;
+var minSize = 0.5;
 var maxSize = 1;
 var areaSize = 160;
 
@@ -85,12 +85,11 @@ for (let i = 0; i < treeCount; i++)
   var zAxis = (Math.random() - 0.5) * areaSize;
 
   // Create the cone geometry for the leaves
-  var coneGeometry = new THREE.ConeGeometry(width+0.5, height+1, 170);
+  var coneGeometry = new THREE.ConeGeometry(radius + width, height+1, 170);
   var cone = new THREE.Mesh(coneGeometry, leavesMat);
 
   // Create the rectangle geometry for the stump
   var stumpGeometry = new THREE.CylinderGeometry(radius, radius, height);
-  
   var stump = new THREE.Mesh(stumpGeometry, woodMat);
 
   // Position the objects
