@@ -61,7 +61,7 @@ var LNormalMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_normal.
 var LRoughnessMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_roughness.jpg');
 var LAOMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_ambientOcclusion.jpg');
 var LHeightMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_height.png');
-var LDMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_Displacement.jpg');
+
 
 var leavesMat = new THREE.MeshStandardMaterial({
   map : LcolorMap,
@@ -71,11 +71,10 @@ var leavesMat = new THREE.MeshStandardMaterial({
   bumpMap : LHeightMap,
   bumpScale : 1.3
 });
-//  var coneMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-// var stumpMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
 
 function CreateTrees()
 {
+  
 for (let i = 0; i < treeCount; i++)
 {
   const height = Math.random() * (maxHeight - minHeight) + minHeight;
@@ -136,7 +135,7 @@ scene.add(ambientLight);
 
 // Particle Geometry
 const partclesGeometry = new THREE.BufferGeometry()
-const count = 10000;
+const count = 20000;
 
 const positions = new Float32Array(count * 3) // Times by 3 reason
 // each postion is composed of 3 values (x y z)
@@ -145,7 +144,7 @@ const colors = new Float32Array(count * 3)
 
 for (let i = 0; i < count * 3; i++) // Times by 3 for same reason above
 {
-    positions[i] = (Math.random() - 0.5) * 100 // have a random value between -05 and +0.5
+    positions[i] = (Math.random() - 0.5) * 200// have a random value between -05 and +0.5
     colors[i] = Math.random() // Random colours weeeee
 }
 
@@ -169,9 +168,8 @@ const particleMaterial = new THREE.PointsMaterial({
 
 //Particle Points
 const particles = new THREE.Points(partclesGeometry, particleMaterial)
-particles.position.y = 80;
-particles.position.x += 50;
-particles.position.z += 30;
+particles.position.y = 150;
+
 scene.add(particles)
 
 /*End of Particle code*/
@@ -214,7 +212,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 //Controls
 const controls = new FlyControls(camera, canvas)
-controls.movementSpeed = 0.05;
+
 controls.lookSpeed = 20;
 //controls.autoForward = true;
 
@@ -229,6 +227,7 @@ controls.lookSpeed = 20;
 // R - Move Up
 // F - Move Down
 // Z - Reset Camera
+// X - Speed Up
 // Space - Lock point of view
 
 //Check if any other buttons are pushed
@@ -236,7 +235,10 @@ window.addEventListener('keydown', onKeyDown);
 window.addEventListener('keyup', onKeyUp);
 
 let spaceKeyPressed = false;
+var MoveSpeed = 0.1;
+controls.movementSpeed = MoveSpeed;
 
+console.log(MoveSpeed);
 function onKeyDown(event) {
   //console.log(event.code);
   //Freeze looking moevment
@@ -247,6 +249,20 @@ function onKeyDown(event) {
   //Reset camera to look straight
   if (event.code === 'KeyZ'){
     camera.lookAt(0,camera.position.y,0);
+  }
+
+  if (event.code === 'KeyX' && MoveSpeed < 0.3){
+    spaceKeyPressed = true;
+    MoveSpeed += 0.1;
+    console.log(MoveSpeed);
+    controls.movementSpeed = MoveSpeed;
+    
+  }
+  else {
+    MoveSpeed = 0.1;
+    console.log(MoveSpeed);
+      controls.movementSpeed = MoveSpeed;
+
   }
 }
 
@@ -382,7 +398,7 @@ let grassTxtLoader = new THREE.TextureLoader()
 let GColorMap = grassTxtLoader.load('grassTexture/Grass.jpg');
 let GHeightMap  = grassTxtLoader.load('grassTexture/BumpGrass.jpg');
 let GDMap = grassTxtLoader.load('grassTexture/GrassDis.jpg');
-let grassLoader = new THREE.TextureLoader().load('Grass.jpg');
+
 
 initLand();
 renderer.render(scene, camera)
@@ -420,7 +436,7 @@ function initLand(){
   //This creates the plane
   function createPlane(){
   let PlaneGeometry = new THREE.PlaneGeometry(LandController.step, LandController.step, 100, 100);
-  let GrassMaterial = new THREE.MeshBasicMaterial({map: grassLoader, color: LandController.Colour, side: THREE.DoubleSide});
+  // let GrassMaterial = new THREE.MeshBasicMaterial({map: grassLoader, color: LandController.Colour, side: THREE.DoubleSide});
   let plane = new THREE.Mesh(PlaneGeometry, grassMat);
   return plane;
   }
