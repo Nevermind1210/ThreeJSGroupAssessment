@@ -90,6 +90,7 @@ controls.movementSpeed = MoveSpeed;
 console.log(MoveSpeed);
 function onKeyDown(event) {
   //console.log(event.code);
+
   //Freeze looking moevment
   if (event.code === 'Space') {
     spaceKeyPressed = true;
@@ -99,7 +100,7 @@ function onKeyDown(event) {
   if (event.code === 'KeyZ'){
     camera.lookAt(0,camera.position.y,0);
   }
-
+  //Speed up Movement
   if (event.code === 'KeyX' && MoveSpeed < 0.3){
     spaceKeyPressed = true;
     MoveSpeed += 0.1;
@@ -107,11 +108,11 @@ function onKeyDown(event) {
     controls.movementSpeed = MoveSpeed;
     
   }
+  //If any other button is pressed instead:
   else {
     MoveSpeed = 0.1;
     console.log(MoveSpeed);
-      controls.movementSpeed = MoveSpeed;
-
+    controls.movementSpeed = MoveSpeed;
   }
 }
 
@@ -149,6 +150,7 @@ renderer.render(scene, camera);
 
 function initParticles(){
 
+  //List of particles which keeps track of how many particles are loaded on scene
   var particlelist = [];
 
   //Particle Texture
@@ -162,6 +164,7 @@ function initParticles(){
     count: 30000
   }
 
+  //Removes particles from scene
   function RemoveParticles(){
     for (var i = 0; i < particlelist.length; i++){
       scene.remove(particlelist[i]);
@@ -206,10 +209,13 @@ function initParticles(){
     particlelist.push(particles);
   }
 
+  //Below is the GUI controls for the particles
+  //The RemoveParticles and AddParticles functions prevent the scene from duplicating and keeping old particles
+
   const ParticleFolder = gui.addFolder('Particles');
   ParticleFolder.add(ParticleController, 'count', 0,100000,1).onChange(function(){
-    RemoveParticles();
-    AddParticles();
+    RemoveParticles();  //First Remove old particles
+    AddParticles();     //Then add new particles
   })
 
   AddParticles();
@@ -294,7 +300,7 @@ function initSky(){
 		renderer.render(scene, camera);
 	}
 
-  // Below is the Pop-up Controls on the screen to do with the sky. This can be removed if not wanted:
+  // Below is the Pop-up Controls on the screen to do with the sky.
 
   const SkyFolder = gui.addFolder('Sky');
 	SkyFolder.add(SkyController, 'turbidity', 0.0, 20.0, 0.1).onChange(ShowSky);
@@ -314,6 +320,7 @@ function initSky(){
 
 /*Land code starts here*/
 
+//Land Textures:
 let grassTxtLoader = new THREE.TextureLoader()
 let GColorMap = grassTxtLoader.load('grassTexture/Grass.jpg');
 let GHeightMap  = grassTxtLoader.load('grassTexture/BumpGrass.jpg');
@@ -351,7 +358,7 @@ function initLand(){
     bumpMap : GHeightMap,
     bumpScale : 2, 
     displacementMap : GDMap,
-    displacementScale : 0.01, //This scale may reveal holes in the ground
+    displacementScale : 0.01, //This scale may reveal holes in the ground, if its a high number
     color: LandController.Colour, 
     side: THREE.DoubleSide 
   });
@@ -400,11 +407,11 @@ function initLand(){
   const LandFolder = gui.addFolder('Land');
   LandFolder.add(LandController, 'step', 0, 50, 1).onChange(function(){
     RemoveLand(); //First Remove the old land
-    AddLand();  //Then add the new land based
+    AddLand();    //Then add the new land based
   });
   LandFolder.addColor(LandController, 'Colour').listen().onChange(function(){
     RemoveLand(); //First Remove the old land
-    AddLand();  //Then add the new land based
+    AddLand();    //Then add the new land based
   });
   LandFolder.open(); 
 
@@ -444,7 +451,7 @@ function initCloud(){
   function AddCloud(){
 
     // Cloud Material
-    var cloudMaterial = new THREE.MeshBasicMaterial({map: cloudTexture, transparent: true });
+    var cloudMaterial = new THREE.MeshBasicMaterial({map: cloudTexture, transparent: true, side: THREE.DoubleSide});
     cloudMaterial.fog = false;
     cloudMaterial.opacity = 0.5;
 
@@ -479,8 +486,8 @@ function initCloud(){
 
   const CloudFolder = gui.addFolder('Cloud');
   CloudFolder.add(CloudController, 'Amount', 0, 1000, 1).onChange(function(){
-    RemoveCloud(); //Remove old clouds first
-    AddCloud(); //Then add new cloulds on the amount
+    RemoveCloud();  //Remove old clouds first
+    AddCloud();     //Then add new cloulds on the amount
   });
   CloudFolder.open(); 
 
@@ -496,6 +503,7 @@ renderer.render(scene, camera);
 
 function initTree(){
 
+  //Tree Variables
   const TreeController = {
     treeCount: 500,
     minRadius: 0.1,
@@ -507,9 +515,10 @@ function initTree(){
     areaSize: 150
   }
 
+  //This list keeps track of the trees that are loaded on the scene
   var treelist = [];
 
-  /////////Tree Textures////////
+  //Wood Textures
   var stumpTxtLoader = new THREE.TextureLoader();
   var colorMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_basecolor.jpg');
   var NormalMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_normal.jpg');
@@ -518,7 +527,7 @@ function initTree(){
   var HeightMap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_height.png');
   var Dmap = stumpTxtLoader.load('stumpTexture/Wood_Bark_006_Displacement.jpg');
 
-
+  //Wood Material
   var woodMat = new THREE.MeshStandardMaterial({
     map : colorMap,
     normalMap : NormalMap,
@@ -530,7 +539,7 @@ function initTree(){
     bumpScale : 2
   });
 
-  ///////////Leaves Textures////////
+  //Leaves Textures
   var leavesTxtLoader = new THREE.TextureLoader();
   var LcolorMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_basecolor.jpg');
   var LNormalMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_normal.jpg');
@@ -539,6 +548,7 @@ function initTree(){
   var LHeightMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_002_height.png');
   var LDMap = leavesTxtLoader.load('leavesTexture/Stylized_Leaves_Displacement.jpg');
 
+  //Leaves Material
   var leavesMat = new THREE.MeshStandardMaterial({
     map : LcolorMap,
     normalMap : LNormalMap,
@@ -547,9 +557,11 @@ function initTree(){
     bumpMap : LHeightMap,
     bumpScale : 1.3
   });
+
   //  var coneMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
   // var stumpMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
 
+  //Removes old trees from the scene
   function RemoveTrees(){
     for (var i = 0; i < treelist.length; i++){
       scene.remove(treelist[i]);
@@ -557,6 +569,7 @@ function initTree(){
     treelist = [];
   }
 
+  //Creates and adds trees onto the scene
   function CreateTrees(){
     for (let i = 0; i < TreeController.treeCount; i++){
       const height = Math.random() * (TreeController.maxHeight - TreeController.minHeight) + TreeController.minHeight;
@@ -582,7 +595,6 @@ function initTree(){
       cone.position.y = topCylinderPos + leavesHeight /2;
       stump.position.y = 0;
   
-
       // Create a group to hold both objects
       var tree = new THREE.Group();
       tree.add(cone);
@@ -596,6 +608,9 @@ function initTree(){
       treelist.push(tree);
     }
   }
+
+  //Below is the GUI controls for the trees
+  //The RemoveTrees and CreateTrees functions prevent the scene from duplicating and keeping old trees
 
   const TreeFolder = gui.addFolder('Trees');
   TreeFolder.add(TreeController, 'treeCount', 0, 1000, 1).onChange(function(){
