@@ -502,7 +502,7 @@ function initTree(){
     maxRadius: 0.4,
     minHeight: 1.5,
     maxHeight: 2,
-    minSize: 0.01,
+    minSize: 0.3,
     maxSize: 1,
     areaSize: 150
   }
@@ -641,26 +641,26 @@ function initTree(){
 
 //Uncomment below to spawn one mirror in the scene, It may lag the scene though
 
-// initMirror()
-// renderer.render(scene, camera);
+initMirror()
+renderer.render(scene, camera);
 
-// function initMirror(){
-//   function AddMirror(){
-//     var MirrorGeometry = new THREE.PlaneGeometry(10,10);
-//     var Mirror = new Reflector(MirrorGeometry, 
-//       {
-//        clipBias: 0.003,
-//        textureWidth: window.innerWidth * window.devicePixelRatio,
-//        textureHeight: window.innerHeight * window.devicePixelRatio,
-//        color: 0x889999
-//      } );
+function initMirror(){
+  function AddMirror(){
+    var MirrorGeometry = new THREE.PlaneGeometry(10,10);
+    var Mirror = new Reflector(MirrorGeometry, 
+      {
+       clipBias: 0.003,
+       textureWidth: window.innerWidth * window.devicePixelRatio,
+       textureHeight: window.innerHeight * window.devicePixelRatio,
+       color: 0x889999
+     } );
      
-//      Mirror.position.y = 0;
-//      Mirror.position.z = - 5;
-//      scene.add( Mirror );
-//   }
+     Mirror.position.y = 0;
+     Mirror.position.z = - 5;
+     scene.add( Mirror );
+  }
 
-//   AddMirror();
-// }
+  AddMirror();
+}
 
 /*End of Mirror Code*/
