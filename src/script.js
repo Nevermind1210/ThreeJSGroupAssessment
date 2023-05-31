@@ -162,7 +162,7 @@ function initParticles(){
 
   //Particle Variables
   const ParticleController = {
-    count: 20000
+    count: 30000
   }
 
   function RemoveParticles(){
@@ -181,7 +181,7 @@ function initParticles(){
 
     for (let i = 0; i < ParticleController.count * 3; i++) // Times by 3 for same reason above
     {
-      positions[i] = (Math.random() - 0.5) * 100 // have a random value between -05 and +0.5
+      positions[i] = (Math.random() - 0.5) * 200 // have a random value between -05 and +0.5
       colors[i] = Math.random() // Random colours weeeee
     }
 
@@ -204,7 +204,7 @@ function initParticles(){
 
     //Particle Points
     const particles = new THREE.Points(partclesGeometry, particleMaterial);
-    particles.position.y +=3;
+    particles.position.y = 100;
     scene.add(particles);
     particlelist.push(particles);
   }
