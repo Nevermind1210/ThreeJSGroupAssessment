@@ -4,6 +4,7 @@ import {ImprovedNoise} from 'three/examples/jsm/math/ImprovedNoise.js'
 import * as dat from 'lil-gui'
 import {Color} from 'three'
 import {Sky} from 'three/examples/jsm/objects/Sky.js'
+import {Reflector} from 'three/examples/jsm/objects/Reflector.js'
 
 // Debug
 
@@ -140,10 +141,6 @@ const animate = () =>
 }
 
 animate()
-
-//Mirror Start
-
-//Mirror End
 
 /*Start of Particles code*/
 
@@ -639,3 +636,31 @@ function initTree(){
 }
 
 /*End Of Tree Code*/
+
+/*Start of Mirror Code*/
+
+//Uncomment below to spawn one mirror in the scene, It may lag the scene though
+
+// initMirror()
+// renderer.render(scene, camera);
+
+// function initMirror(){
+//   function AddMirror(){
+//     var MirrorGeometry = new THREE.PlaneGeometry(10,10);
+//     var Mirror = new Reflector(MirrorGeometry, 
+//       {
+//        clipBias: 0.003,
+//        textureWidth: window.innerWidth * window.devicePixelRatio,
+//        textureHeight: window.innerHeight * window.devicePixelRatio,
+//        color: 0x889999
+//      } );
+     
+//      Mirror.position.y = 0;
+//      Mirror.position.z = - 5;
+//      scene.add( Mirror );
+//   }
+
+//   AddMirror();
+// }
+
+/*End of Mirror Code*/
