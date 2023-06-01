@@ -703,34 +703,42 @@ function initTree(){
   TreeFolder.add(TreeController, 'treeCount', 0, 1000, 1).onChange(function(){
     RemoveTrees();
     CreateTrees();
+    CreateTrees2();
   })
   TreeFolder.add(TreeController, 'minRadius', 0.15, 0.25, 0.001).onChange(function(){
     RemoveTrees();
     CreateTrees();
+    CreateTrees2();
   })
   TreeFolder.add(TreeController, 'maxRadius', 0.35, 0.45, 0.001).onChange(function(){
     RemoveTrees();
     CreateTrees();
+    CreateTrees2();
   })
   TreeFolder.add(TreeController, 'minHeight', 1.25, 1.75, 0.01).onChange(function(){ 
     RemoveTrees();
     CreateTrees();
+    CreateTrees2();
   })
   TreeFolder.add(TreeController, 'maxHeight', 4.5, 5.5, 0.01).onChange(function(){ 
     RemoveTrees();
     CreateTrees();
+    CreateTrees2();
   })
   TreeFolder.add(TreeController, 'minSize', 0.25, 0.35, 0.001).onChange(function(){ 
     RemoveTrees();
     CreateTrees();
+    CreateTrees2();
   })
   TreeFolder.add(TreeController, 'maxSize', 0.75, 1.25, 0.001).onChange(function(){ 
     RemoveTrees();
     CreateTrees();
+    CreateTrees2();
   })
   TreeFolder.add(TreeController, 'areaSize', 0, 300, 1).onChange(function(){
     RemoveTrees();
     CreateTrees();
+    CreateTrees2();
   })
 
   CreateTrees();
