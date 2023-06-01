@@ -204,7 +204,7 @@ function initParticles(){
 
     //Particle Points
     const particles = new THREE.Points(partclesGeometry, particleMaterial);
-    particles.position.y = 100;
+    particles.position.y = 150;
     scene.add(particles);
     particlelist.push(particles);
   }
@@ -506,13 +506,13 @@ function initTree(){
   //Tree Variables
   const TreeController = {
     treeCount: 500,
-    minRadius: 0.1,
+    minRadius: 0.2,
     maxRadius: 0.4,
     minHeight: 1.5,
-    maxHeight: 2,
+    maxHeight: 5,
     minSize: 0.3,
     maxSize: 1,
-    areaSize: 150
+    areaSize: 200
   }
 
   //This list keeps track of the trees that are loaded on the scene
@@ -558,8 +558,6 @@ function initTree(){
     bumpScale : 1.3
   });
 
-  //  var coneMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  // var stumpMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
 
   //Removes old trees from the scene
   function RemoveTrees(){
@@ -580,7 +578,7 @@ function initTree(){
       var zAxis = (Math.random() - 0.5) * TreeController.areaSize;
 
       // Create the cone geometry for the leaves
-      var coneGeometry = new THREE.ConeGeometry(width+0.5, height+1, 170);
+      var coneGeometry = new THREE.ConeGeometry(radius + 1, height+1, 170);
       var cone = new THREE.Mesh(coneGeometry, leavesMat);
 
       // Create the rectangle geometry for the stump
@@ -659,11 +657,22 @@ function initTree(){
 initMirror()
 renderer.render(scene, camera);
 
+
+
+
 function initMirror(){
-  function AddMirror(){
-    var MirrorGeometry = new THREE.PlaneGeometry(10,10);
+  
+  var backRot = Math.PI;
+  var leftRot = Math.PI/2;
+  var rightRot = Math.PI * 1.5;
+  
+  
+
+  function AddMirror(Rotate, xPos, zPos){
+    var MirrorGeometry = new THREE.PlaneGeometry(220,100);
     var Mirror = new Reflector(MirrorGeometry, 
       {
+      
        clipBias: 0.003,
        textureWidth: window.innerWidth * window.devicePixelRatio,
        textureHeight: window.innerHeight * window.devicePixelRatio,
@@ -671,11 +680,16 @@ function initMirror(){
      } );
      
      Mirror.position.y = 0;
-     Mirror.position.z = - 5;
+     Mirror.position.x = xPos;
+     Mirror.position.z = zPos;
+     Mirror.rotation.y = Rotate;
      scene.add( Mirror );
   }
 
-  AddMirror();
+  AddMirror(backRot, 0, 110);
+  AddMirror(leftRot, -110, 0);
+  // AddMirror(rightRot, 110, 0);
+  // AddMirror(rightRot, rightPos, 0);
 }
 
 /*End of Mirror Code*/
