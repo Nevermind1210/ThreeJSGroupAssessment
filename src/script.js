@@ -405,7 +405,7 @@ function initLand(){
   //The RemoveLand and AddLand functions prevent the scene from duplicating and keeping old planes
 
   const LandFolder = gui.addFolder('Land');
-  LandFolder.add(LandController, 'step', 0, 50, 1).onChange(function(){
+  LandFolder.add(LandController, 'step', 0, 100, 1).onChange(function(){
     RemoveLand(); //First Remove the old land
     AddLand();    //Then add the new land based
   });
@@ -704,7 +704,7 @@ function initTree(){
     RemoveTrees();
     CreateTrees();
   })
-  TreeFolder.add(TreeController, 'minRadius', 0.05, 0.15, 0.001).onChange(function(){
+  TreeFolder.add(TreeController, 'minRadius', 0.15, 0.25, 0.001).onChange(function(){
     RemoveTrees();
     CreateTrees();
   })
@@ -712,19 +712,19 @@ function initTree(){
     RemoveTrees();
     CreateTrees();
   })
-  TreeFolder.add(TreeController, 'minHeight', 1.25, 1.75, 0.01).onChange(function(){
+  TreeFolder.add(TreeController, 'minHeight', 1.25, 1.75, 0.01).onChange(function(){ 
     RemoveTrees();
     CreateTrees();
   })
-  TreeFolder.add(TreeController, 'maxHeight', 1.75, 2.25, 0.01).onChange(function(){
+  TreeFolder.add(TreeController, 'maxHeight', 4.5, 5.5, 0.01).onChange(function(){ 
     RemoveTrees();
     CreateTrees();
   })
-  TreeFolder.add(TreeController, 'minSize', 0.0075, 0.0125, 0.001).onChange(function(){
+  TreeFolder.add(TreeController, 'minSize', 0.25, 0.35, 0.001).onChange(function(){ 
     RemoveTrees();
     CreateTrees();
   })
-  TreeFolder.add(TreeController, 'maxSize', 0.75, 1.25, 0.001).onChange(function(){
+  TreeFolder.add(TreeController, 'maxSize', 0.75, 1.25, 0.001).onChange(function(){ 
     RemoveTrees();
     CreateTrees();
   })
